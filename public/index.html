@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CareConnect</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+
+      body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #e3eeff 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .top-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 40px;
+      }
+
+      header {
+        text-align: left;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        backdrop-filter: blur(10px);
+        flex: 0 0 auto;
+      }
+
+      .logo {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        letter-spacing: -1px;
+        white-space: nowrap;
+      }
+
+      .logo .blue-c {
+        color: #2196f3;
+        text-shadow: 2px 2px 4px rgba(33, 150, 243, 0.2);
+        transition: all 0.3s ease;
+      }
+
+      .logo:hover .blue-c {
+        color: #1976d2;
+        text-shadow: 3px 3px 6px rgba(33, 150, 243, 0.3);
+      }
+
+      .info-box {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        transition: transform 0.3s ease;
+        flex: 0 0 auto;
+        min-width: 200px;
+      }
+
+      .info-box:hover {
+        transform: translateY(-5px);
+      }
+
+      .info-box p {
+        margin: 8px 0;
+        color: #2c3e50;
+        font-size: 0.95rem;
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+      }
+
+      .cards-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 30px;
+        flex-wrap: wrap;
+        margin-top: 40px;
+        perspective: 1000px;
+      }
+
+      .card {
+        width: 300px;
+        height: 200px;
+        border-radius: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          45deg,
+          rgba(255, 255, 255, 0.1),
+          rgba(255, 255, 255, 0)
+        );
+        pointer-events: none;
+      }
+
+      .card:hover {
+        transform: translateY(-10px) rotateX(5deg);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .card.critical {
+        background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
+      }
+
+      .card.routine {
+        background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+      }
+
+      .card.event-based {
+        background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+      }
+
+      .card-title {
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .plus-icon {
+        color: white;
+        font-size: 2.5rem;
+        transition: all 0.3s ease;
+        filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
+      }
+
+      .plus-icon:hover {
+        transform: rotate(90deg) scale(1.1);
+      }
+      .dashboard-button {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        padding: 12px 24px;
+        background: #2c3e50;
+        color: white;
+        text-decoration: none;
+        border-radius: 30px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease;
+        z-index: 1000;
+      }
+
+      .dashboard-button:hover {
+        transform: translateY(-3px);
+      }
+      .update-button {
+        width: 100%;
+        margin-top: 15px;
+        padding: 12px 20px;
+        background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+        color: white;
+        border: none;
+        border-radius: 15px;
+        cursor: pointer;
+        font-family: "Poppins", sans-serif;
+        font-size: 0.95rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(33, 150, 243, 0.2);
+        backdrop-filter: blur(10px);
+      }
+
+      .update-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(33, 150, 243, 0.3);
+      }
+
+      .update-button i {
+        font-size: 1rem;
+      }
+
+      /* Update popup styles to match the theme */
+      .popup-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(135deg, #f5f7fa 0%, #e3eeff 100%);
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        width: 90%;
+        max-width: 400px;
+        backdrop-filter: blur(10px);
+      }
+
+      .popup-content h2 {
+        color: #2c3e50;
+        margin-bottom: 20px;
+        font-weight: 600;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #2c3e50;
+        font-weight: 500;
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid rgba(33, 150, 243, 0.2);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.9);
+        font-family: "Poppins", sans-serif;
+        transition: all 0.3s ease;
+      }
+
+      .form-group input:focus {
+        outline: none;
+        border-color: #2196f3;
+        box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+      }
+
+      .submit-button {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-family: "Poppins", sans-serif;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(33, 150, 243, 0.2);
+      }
+
+      .submit-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(33, 150, 243, 0.3);
+      }
+
+      .close-popup {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        font-size: 24px;
+        cursor: pointer;
+        color: #2c3e50;
+        transition: all 0.3s ease;
+      }
+
+      .close-popup:hover {
+        color: #1976d2;
+        transform: rotate(90deg);
+      }
+
+      /* Overlay background */
+      .popup {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(5px);
+        z-index: 1000;
+      }
+
+      @media (max-width: 768px) {
+        .popup-content {
+          width: 95%;
+          padding: 20px;
+        }
+
+        .update-button {
+          padding: 10px 16px;
+          font-size: 0.9rem;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .top-container {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .info-box {
+          width: 100%;
+          max-width: 300px;
+        }
+
+        .cards-container {
+          margin-top: 20px;
+        }
+
+        .card {
+          width: 100%;
+          max-width: 300px;
+        }
+
+        header {
+          width: 100%;
+          text-align: center;
+        }
+
+        .logo {
+          font-size: 2rem;
+        }
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .card {
+        animation: fadeInUp 0.6s ease backwards;
+      }
+
+      .card:nth-child(1) {
+        animation-delay: 0.2s;
+      }
+      .card:nth-child(2) {
+        animation-delay: 0.4s;
+      }
+      .card:nth-child(3) {
+        animation-delay: 0.6s;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top-container">
+      <header>
+        <h1 class="logo">
+          <span class="blue-c">C</span>are<span class="blue-c">C</span>onnect
+        </h1>
+      </header>
+
+      <div class="info-box">
+        <p>Date: <span id="current-date"></span></p>
+        <p>Time: <span id="current-time"></span></p>
+        <p>In House: <span id="in-house-display">0</span></p>
+        <p>New Admissions: <span id="new-admissions-display">0</span></p>
+        <button id="update-info" class="update-button">
+          <i class="fas fa-edit"></i> Update Information
+        </button>
+      </div>
+    </div>
+    <div id="update-popup" class="popup">
+      <div class="popup-content">
+        <span class="close-popup">&times;</span>
+        <h2>Update Information</h2>
+        <form id="update-form">
+          <div class="form-group">
+            <label for="in-house">In House:</label>
+            <input type="number" id="in-house" min="0" required />
+          </div>
+          <div class="form-group">
+            <label for="new-admissions">New Admissions:</label>
+            <input type="number" id="new-admissions" min="0" required />
+          </div>
+          <button type="submit" class="submit-button">Update</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="cards-container">
+      <div class="card critical" data-type="critical">
+        <h2 class="card-title">Critical</h2>
+        <i class="fas fa-plus-circle plus-icon"></i>
+      </div>
+      <div class="card routine" data-type="routine">
+        <h2 class="card-title">Routine</h2>
+        <i class="fas fa-plus-circle plus-icon"></i>
+      </div>
+      <div class="card event-based" data-type="event-based">
+        <h2 class="card-title">Event-Based</h2>
+        <i class="fas fa-plus-circle plus-icon"></i>
+      </div>
+    </div>
+    <a href="dashboard.html" class="dashboard-button">
+      <i class="fas fa-chart-line"></i> View Dashboard
+    </a>
+
+    <script>
+      function updateDateTime() {
+        const now = new Date();
+        const dd = String(now.getDate()).padStart(2, "0");
+        const mm = String(now.getMonth() + 1).padStart(2, "0");
+        const yyyy = now.getFullYear();
+        const time = now.toLocaleTimeString();
+
+        document.getElementById(
+          "current-date"
+        ).textContent = `${dd}/${mm}/${yyyy}`;
+        document.getElementById("current-time").textContent = time;
+      }
+
+      updateDateTime();
+      setInterval(updateDateTime, 1000);
+
+      // Add click handlers for cards
+      document.querySelectorAll(".card").forEach((card) => {
+        card.addEventListener("click", function () {
+          const type = this.getAttribute("data-type");
+          window.location.href = `form.html?type=${type}`;
+        });
+      });
+    </script>
+    <script src="/js/shared.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // Initialize the info manager
+        InfoManager.init();
+
+        const updateButton = document.getElementById("update-info");
+        const popup = document.getElementById("update-popup");
+        const closePopup = document.querySelector(".close-popup");
+        const updateForm = document.getElementById("update-form");
+
+        // Show popup with current values
+        updateButton.addEventListener("click", () => {
+          const counts = InfoManager.getCounts();
+          document.getElementById("in-house").value = counts.inHouse;
+          document.getElementById("new-admissions").value =
+            counts.newAdmissions;
+          popup.style.display = "block";
+        });
+
+        // Close popup
+        closePopup.addEventListener("click", () => {
+          popup.style.display = "none";
+        });
+
+        // Close on outside click
+        window.addEventListener("click", (e) => {
+          if (e.target === popup) {
+            popup.style.display = "none";
+          }
+        });
+
+        // Handle form submission
+        updateForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const inHouse = document.getElementById("in-house").value;
+          const newAdmissions = document.getElementById("new-admissions").value;
+
+          InfoManager.updateCounts(inHouse, newAdmissions);
+          popup.style.display = "none";
+        });
+      });
+    </script>
+  </body>
+</html>

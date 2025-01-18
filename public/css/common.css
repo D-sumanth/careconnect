@@ -1,0 +1,26 @@
+/* public/css/common.css */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.logo {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2c3e50;
+  letter-spacing: -1px;
+}
+
+.logo .blue-c {
+  color: #2196f3;
+  text-shadow: 2px 2px 4px rgba(33, 150, 243, 0.2);
+}
+
+

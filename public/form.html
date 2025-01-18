@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Form - CareConnect</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/common.css" />
+    <link rel="stylesheet" href="/css/form.css" />
+  </head>
+  <body>
+    <div class="top-container">
+      <header>
+        <h1 class="logo">
+          <span class="blue-c">C</span>are<span class="blue-c">C</span>onnect
+        </h1>
+      </header>
+    </div>
+
+    <!-- Replace only the form-container div in the form.html with this code -->
+    <div class="form-container">
+      <form id="infoForm" onsubmit="submitForm(event)">
+        <div class="form-group">
+          <label for="home">Home</label>
+          <input
+            type="text"
+            id="home"
+            placeholder="Enter home details"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="department">Department</label>
+          <input
+            type="text"
+            id="department"
+            placeholder="Enter department"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="nameDesignation">Name-Designation</label>
+          <input
+            type="text"
+            id="nameDesignation"
+            placeholder="Enter name and designation"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="information">Information</label>
+          <textarea
+            id="information"
+            placeholder="Enter information details"
+            required
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="authorizedBy">Authorized By</label>
+          <input
+            type="text"
+            id="authorizedBy"
+            placeholder="Enter authorizing person's name"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="state">State of Information</label>
+          <select id="state" required>
+            <option value="">Select state</option>
+            <option value="Critical">Critical</option>
+            <option value="Routine">Routine</option>
+            <option value="Event-Based">Event-Based</option>
+          </select>
+        </div>
+
+        <div class="send-to-box">
+          <label>Send To</label>
+          <div class="send-to-options">
+            <div class="option-chip">All</div>
+            <div class="option-chip">Catering</div>
+            <div class="option-chip">Outreach</div>
+            <div class="option-chip">Reception</div>
+            <div class="option-chip">Dementia</div>
+            <div class="option-chip">Housekeeping</div>
+            <div class="option-chip">Admin Office</div>
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button
+            type="button"
+            class="btn btn-back"
+            onclick="window.location.href='index.html'"
+          >
+            <i class="fas fa-arrow-left"></i> Back
+          </button>
+          <button type="submit" class="btn btn-send">
+            <i class="fas fa-paper-plane"></i> Send
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      // Get the type from URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const type = urlParams.get("type");
+
+      // Add the type class to body
+      document.body.classList.add(type);
+
+      // Set the correct state in the dropdown
+      document.getElementById("state").value =
+        type.charAt(0).toUpperCase() + type.slice(1);
+
+      // Form submission handler
+      document
+        .getElementById("infoForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          // Add form submission logic here
+          alert("Form submitted successfully!");
+        });
+
+      // Make chips selectable
+      document.querySelectorAll(".option-chip").forEach((chip) => {
+        chip.addEventListener("click", function () {
+          this.classList.toggle("selected");
+          if (this.classList.contains("selected")) {
+            this.style.background = getComputedStyle(document.body).background;
+            this.style.color = "white";
+          } else {
+            this.style.background = "white";
+            this.style.color = "";
+          }
+        });
+      });
+    </script>
+    <script src="/js/form.js"></script>
+  </body>
+</html>

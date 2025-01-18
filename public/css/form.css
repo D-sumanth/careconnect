@@ -1,0 +1,233 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  padding: 20px;
+}
+
+/* Background styles for different types */
+body.critical {
+  background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
+}
+
+body.routine {
+  background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+}
+
+body.event-based {
+  background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+}
+
+.top-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 40px;
+  gap: 20px;
+}
+
+header {
+  text-align: left;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(10px);
+  flex: 0 0 auto;
+}
+
+.logo {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2c3e50;
+  letter-spacing: -1px;
+  white-space: nowrap;
+}
+
+.logo .blue-c {
+  color: #2196f3;
+  text-shadow: 2px 2px 4px rgba(33, 150, 243, 0.2);
+}
+
+.form-container {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  max-width: 800px;
+  margin: 0 auto;
+  animation: fadeIn 0.6s ease;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+input[type="text"],
+textarea,
+select {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.critical input[type="text"]:focus,
+.critical textarea:focus,
+.critical select:focus {
+  border-color: #ff9800;
+  box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.2);
+}
+
+.routine input[type="text"]:focus,
+.routine textarea:focus,
+.routine select:focus {
+  border-color: #2196f3;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+}
+
+.event-based input[type="text"]:focus,
+.event-based textarea:focus,
+.event-based select:focus {
+  border-color: #4caf50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+}
+
+textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.send-to-box {
+  background: #f5f5f5;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.send-to-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.option-chip {
+  background: #fff;
+  padding: 8px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Chip styles for different types */
+.critical .option-chip {
+  border: 2px solid #ff9800;
+  color: #ff9800;
+}
+
+.routine .option-chip {
+  border: 2px solid #2196f3;
+  color: #2196f3;
+}
+
+.event-based .option-chip {
+  border: 2px solid #4caf50;
+  color: #4caf50;
+}
+
+.button-group {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.btn {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Button styles for different types */
+.critical .btn-back {
+  background: #fff;
+  color: #ff9800;
+  border: 2px solid #ff9800;
+}
+
+.critical .btn-send {
+  background: #ff9800;
+  color: white;
+}
+
+.routine .btn-back {
+  background: #fff;
+  color: #2196f3;
+  border: 2px solid #2196f3;
+}
+
+.routine .btn-send {
+  background: #2196f3;
+  color: white;
+}
+
+.event-based .btn-back {
+  background: #fff;
+  color: #4caf50;
+  border: 2px solid #4caf50;
+}
+
+.event-based .btn-send {
+  background: #4caf50;
+  color: white;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .form-container {
+    padding: 20px;
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}

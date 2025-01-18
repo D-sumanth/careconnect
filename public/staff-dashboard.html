@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Staff Dashboard - CareConnect</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/common.css" />
+    <link rel="stylesheet" href="/css/staff.css" />
+  </head>
+  <body>
+    <div class="top-container">
+      <header>
+        <h1 class="logo">
+          <span class="blue-c">C</span>are<span class="blue-c">C</span>onnect
+        </h1>
+      </header>
+
+      <div class="info-box">
+        <p>Date: <span id="current-date"></span></p>
+        <p>Time: <span id="current-time"></span></p>
+        <p>In House: <span data-info="in-house">1</span></p>
+        <p>New Admissions: <span data-info="new-admissions">1</span></p>
+      </div>
+
+    <div class="main-content">
+      <div class="info-block critical">
+        <div class="block-header">
+          <i class="fas fa-exclamation-circle"></i>
+          Critical Information
+        </div>
+        <div class="block-content" id="criticalContent">
+          <!-- Content will be loaded dynamically -->
+        </div>
+      </div>
+
+      <div class="info-block routine">
+        <div class="block-header">
+          <i class="fas fa-clipboard-list"></i>
+          Routine Information
+        </div>
+        <div class="block-content" id="routineContent">
+          <!-- Content will be loaded dynamically -->
+        </div>
+      </div>
+
+      <div class="info-block event-based">
+        <div class="block-header">
+          <i class="fas fa-calendar-alt"></i>
+          Event Based Information
+        </div>
+        <div class="block-content" id="eventContent">
+          <!-- Content will be loaded dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <a href="index.html" class="back-button">
+      <i class="fas fa-arrow-left"></i>
+      Back to Home
+    </a>
+
+    <script>
+      // Keep your existing date/time update function
+      function updateDateTime() {
+        const now = new Date();
+        const dd = String(now.getDate()).padStart(2, "0");
+        const mm = String(now.getMonth() + 1).padStart(2, "0");
+        const yyyy = now.getFullYear();
+        const time = now.toLocaleTimeString();
+
+        document.getElementById(
+          "current-date"
+        ).textContent = `${dd}/${mm}/${yyyy}`;
+        document.getElementById("current-time").textContent = time;
+      }
+
+      updateDateTime();
+      setInterval(updateDateTime, 1000);
+    </script>
+    <script src="/js/staffdashboard.js"></script>
+    <script src="/js/shared.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    InfoManager.init();
+  });
+</script>
+  </body>
+</html>
