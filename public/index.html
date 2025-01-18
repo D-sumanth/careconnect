@@ -309,9 +309,7 @@
           padding: 10px 16px;
           font-size: 0.9rem;
         }
-      }
 
-      @media (max-width: 768px) {
         .top-container {
           flex-direction: column;
           align-items: center;
@@ -402,24 +400,28 @@
     <a href="dashboard.html" class="dashboard-button">
       <i class="fas fa-chart-line"></i> View Dashboard
     </a>
-    <script src="/js/shared.js"></script>
+
     <!-- Popup -->
     <div id="updatePopup" class="popup">
       <div class="popup-content">
         <span class="close-popup">&times;</span>
         <h2>Update Information</h2>
-        <div class="form-group">
-          <label for="inHouseCount">In House Count:</label>
-          <input type="number" id="inHouseCount" min="0" />
-        </div>
-        <div class="form-group">
-          <label for="newAdmissions">New Admissions:</label>
-          <input type="number" id="newAdmissions" min="0" />
-        </div>
-        <button class="submit-button">Update</button>
+        <form id="updateForm" onsubmit="return false;">
+          <div class="form-group">
+            <label for="inHouseCount">In House Count:</label>
+            <input type="number" id="inHouseCount" min="0" required />
+          </div>
+          <div class="form-group">
+            <label for="newAdmissions">New Admissions:</label>
+            <input type="number" id="newAdmissions" min="0" required />
+          </div>
+          <button type="submit" class="submit-button">Update</button>
+        </form>
       </div>
     </div>
+
     <script>
+      // Date and Time Update Function
       function updateDateTime() {
         const now = new Date();
         const dd = String(now.getDate()).padStart(2, "0");
@@ -433,27 +435,87 @@
         document.getElementById("current-time").textContent = time;
       }
 
+      // Initialize date/time and set interval
       updateDateTime();
       setInterval(updateDateTime, 1000);
 
-      // Add click handlers for cards
+      // Fetch counts from database on page load
+      async function fetchCounts() {
+        try {
+          const response = await fetch("/api/counts");
+          if (!response.ok) throw new Error("Failed to fetch counts");
+          const data = await response.json();
+
+          document.getElementById("in-house-display").textContent =
+            data.in_house;
+          document.getElementById("new-admissions-display").textContent =
+            data.new_admissions;
+        } catch (error) {
+          console.error("Error fetching counts:", error);
+        }
+      }
+
+      // Load initial counts
+      fetchCounts();
+
+      // Card click handlers
       document.querySelectorAll(".card").forEach((card) => {
         card.addEventListener("click", function () {
           const type = this.getAttribute("data-type");
           window.location.href = `form.html?type=${type}`;
         });
       });
-      // Get the popup elements
+
+      // Popup elements
       const updateButton = document.getElementById("update-info");
       const popup = document.getElementById("updatePopup");
       const closePopup = document.querySelector(".close-popup");
+      const submitButton = document.querySelector(".submit-button");
 
-      // Show popup when update button is clicked
+      // Submit button handler
+      submitButton.addEventListener("click", async () => {
+        const inHouseCount = document.getElementById("inHouseCount");
+        const newAdmissions = document.getElementById("newAdmissions");
+
+        if (inHouseCount.value < 0 || newAdmissions.value < 0) {
+          alert("Please enter valid numbers");
+          return;
+        }
+
+        try {
+          const response = await fetch("/api/update-counts", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              inHouse: parseInt(inHouseCount.value),
+              newAdmissions: parseInt(newAdmissions.value),
+            }),
+          });
+
+          if (!response.ok) throw new Error("Failed to update counts");
+
+          // Update display
+          document.getElementById("in-house-display").textContent =
+            inHouseCount.value;
+          document.getElementById("new-admissions-display").textContent =
+            newAdmissions.value;
+
+          // Close popup
+          popup.classList.remove("active");
+        } catch (error) {
+          console.error("Error updating counts:", error);
+          alert("Failed to update counts. Please try again.");
+        }
+      });
+
+      // Show popup
       updateButton.addEventListener("click", () => {
         popup.classList.add("active");
       });
 
-      // Close popup when X is clicked
+      // Close popup
       closePopup.addEventListener("click", () => {
         popup.classList.remove("active");
       });
@@ -462,6 +524,18 @@
       window.addEventListener("click", (event) => {
         if (event.target === popup) {
           popup.classList.remove("active");
+        }
+      });
+    </script>
+    <script src="/js/shared.js"></script>
+    <script>
+      // Initialize InfoManager when the page loads
+      document.addEventListener("DOMContentLoaded", async () => {
+        try {
+          await InfoManager.init();
+          console.log("InfoManager initialized successfully");
+        } catch (error) {
+          console.error("Failed to initialize InfoManager:", error);
         }
       });
     </script>
