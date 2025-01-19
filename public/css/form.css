@@ -88,36 +88,30 @@ select {
   background: rgba(255, 255, 255, 0.9);
 }
 
-.critical input[type="text"]:focus,
-.critical textarea:focus,
-.critical select:focus {
-  border-color: #ff9800;
-  box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.2);
-}
-
-.routine input[type="text"]:focus,
-.routine textarea:focus,
-.routine select:focus {
-  border-color: #2196f3;
-  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
-}
-
-.event-based input[type="text"]:focus,
-.event-based textarea:focus,
-.event-based select:focus {
-  border-color: #4caf50;
-  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
-}
-
 textarea {
   min-height: 120px;
   resize: vertical;
 }
 
+input[type="text"]:focus,
+textarea:focus,
+select:focus {
+  border-color: #2196f3;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+}
+
+.name-designation-group {
+  display: flex;
+  gap: 20px;
+}
+
+.name-field,
+.designation-field {
+  flex: 1;
+}
+
 .send-to-box {
-  background: #f5f5f5;
-  padding: 20px;
-  border-radius: 10px;
   margin-bottom: 20px;
 }
 
@@ -129,11 +123,11 @@ textarea {
 }
 
 .option-chip {
-  background: #fff;
   padding: 8px 15px;
   border-radius: 20px;
   cursor: pointer;
   transition: all 0.3s ease;
+  background: white;
 }
 
 /* Chip styles for different types */
@@ -152,6 +146,21 @@ textarea {
   color: #4caf50;
 }
 
+.critical .option-chip.selected {
+  background-color: #ff9800;
+  color: white;
+}
+
+.routine .option-chip.selected {
+  background-color: #2196f3;
+  color: white;
+}
+
+.event-based .option-chip.selected {
+  background-color: #4caf50;
+  color: white;
+}
+
 .button-group {
   display: flex;
   gap: 15px;
@@ -163,42 +172,20 @@ textarea {
   border: none;
   border-radius: 10px;
   font-size: 1rem;
-  font-weight: 600;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   transition: all 0.3s ease;
 }
 
-/* Button styles for different types */
-.critical .btn-back {
-  background: #fff;
-  color: #ff9800;
-  border: 2px solid #ff9800;
+.btn-back {
+  background: #e0e0e0;
+  color: #2c3e50;
 }
 
-.critical .btn-send {
-  background: #ff9800;
-  color: white;
-}
-
-.routine .btn-back {
-  background: #fff;
-  color: #2196f3;
-  border: 2px solid #2196f3;
-}
-
-.routine .btn-send {
+.btn-send {
   background: #2196f3;
-  color: white;
-}
-
-.event-based .btn-back {
-  background: #fff;
-  color: #4caf50;
-  border: 2px solid #4caf50;
-}
-
-.event-based .btn-send {
-  background: #4caf50;
   color: white;
 }
 
@@ -223,11 +210,17 @@ textarea {
     padding: 20px;
   }
 
+  .name-designation-group {
+    flex-direction: column;
+    gap: 20px;
+  }
+
   .button-group {
     flex-direction: column;
   }
 
   .btn {
     width: 100%;
+    justify-content: center;
   }
 }
