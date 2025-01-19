@@ -172,6 +172,15 @@ async function loadAcknowledgments(infoId, container) {
       '<p class="error-message">Error loading XXXXXXXXXXXXXXX</p>';
   }
 }
+document.addEventListener('DOMContentLoaded', async () => {
+  // Any dashboard-specific initialization code
+  
+  // Set up automatic refresh of counts every 30 seconds
+  setInterval(() => {
+    InfoManager.fetchAndDisplayCounts();
+  }, 30000);
+});
+
 
 // Initial load
 fetchInformation();
