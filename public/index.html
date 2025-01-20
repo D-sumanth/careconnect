@@ -12,358 +12,7 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: "Poppins", sans-serif;
-      }
-
-      body {
-        background: linear-gradient(135deg, #f5f7fa 0%, #e3eeff 100%);
-        min-height: 100vh;
-        padding: 20px;
-      }
-
-      .top-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 40px;
-      }
-
-      header {
-        text-align: left;
-        padding: 20px;
-        background: rgba(255, 255, 255, 0.9);
-        border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-        backdrop-filter: blur(10px);
-        flex: 0 0 auto;
-      }
-
-      .logo {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #2c3e50;
-        letter-spacing: -1px;
-        white-space: nowrap;
-      }
-
-      .logo .blue-c {
-        color: #2196f3;
-        text-shadow: 2px 2px 4px rgba(33, 150, 243, 0.2);
-        transition: all 0.3s ease;
-      }
-
-      .logo:hover .blue-c {
-        color: #1976d2;
-        text-shadow: 3px 3px 6px rgba(33, 150, 243, 0.3);
-      }
-
-      .info-box {
-        background: rgba(255, 255, 255, 0.95);
-        padding: 20px;
-        border-radius: 15px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        backdrop-filter: blur(10px);
-        transition: transform 0.3s ease;
-        flex: 0 0 auto;
-        min-width: 200px;
-      }
-
-      .info-box:hover {
-        transform: translateY(-5px);
-      }
-
-      .info-box p {
-        margin: 8px 0;
-        color: #2c3e50;
-        font-size: 0.95rem;
-        display: flex;
-        justify-content: space-between;
-        gap: 20px;
-      }
-
-      .cards-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 30px;
-        flex-wrap: wrap;
-        margin-top: 40px;
-        perspective: 1000px;
-      }
-
-      .card {
-        width: 300px;
-        height: 200px;
-        border-radius: 20px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-        cursor: pointer;
-      }
-
-      .card::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(
-          45deg,
-          rgba(255, 255, 255, 0.1),
-          rgba(255, 255, 255, 0)
-        );
-        pointer-events: none;
-      }
-
-      .card:hover {
-        transform: translateY(-10px) rotateX(5deg);
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-      }
-
-      .card.critical {
-        background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
-      }
-
-      .card.routine {
-        background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
-      }
-
-      .card.event-based {
-        background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
-      }
-
-      .card-title {
-        color: white;
-        font-size: 1.5rem;
-        font-weight: 600;
-        margin-bottom: 20px;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-      }
-
-      .plus-icon {
-        color: white;
-        font-size: 2.5rem;
-        transition: all 0.3s ease;
-        filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
-      }
-
-      .plus-icon:hover {
-        transform: rotate(90deg) scale(1.1);
-      }
-      .dashboard-button {
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        padding: 12px 24px;
-        background: #2c3e50;
-        color: white;
-        text-decoration: none;
-        border-radius: 30px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        transition: transform 0.3s ease;
-        z-index: 1000;
-      }
-
-      .dashboard-button:hover {
-        transform: translateY(-3px);
-      }
-      .update-button {
-        width: 100%;
-        margin-top: 15px;
-        padding: 12px 20px;
-        background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
-        color: white;
-        border: none;
-        border-radius: 15px;
-        cursor: pointer;
-        font-family: "Poppins", sans-serif;
-        font-size: 0.95rem;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(33, 150, 243, 0.2);
-        backdrop-filter: blur(10px);
-      }
-
-      .update-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(33, 150, 243, 0.3);
-      }
-
-      .update-button i {
-        font-size: 1rem;
-      }
-
-      .form-group {
-        margin-bottom: 20px;
-      }
-
-      .form-group label {
-        display: block;
-        margin-bottom: 8px;
-        color: #2c3e50;
-        font-weight: 500;
-      }
-
-      .form-group input {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid rgba(33, 150, 243, 0.2);
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.9);
-        font-family: "Poppins", sans-serif;
-        transition: all 0.3s ease;
-      }
-
-      .form-group input:focus {
-        outline: none;
-        border-color: #2196f3;
-        box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
-      }
-
-      .submit-button {
-        width: 100%;
-        padding: 12px;
-        background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
-        color: white;
-        border: none;
-        border-radius: 10px;
-        font-family: "Poppins", sans-serif;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(33, 150, 243, 0.2);
-      }
-
-      .submit-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(33, 150, 243, 0.3);
-      }
-
-      .close-popup {
-        position: absolute;
-        top: 15px;
-        right: 20px;
-        font-size: 24px;
-        cursor: pointer;
-        color: #2c3e50;
-        transition: all 0.3s ease;
-      }
-
-      .close-popup:hover {
-        color: #1976d2;
-        transform: rotate(90deg);
-      }
-
-      /* Overlay background */
-      .popup {
-        display: none; /* Initial state is hidden */
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
-      }
-
-      /* Add this new class for when popup is active */
-      .popup.active {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-
-      .popup-content {
-        position: relative;
-        background: linear-gradient(135deg, #f5f7fa 0%, #e3eeff 100%);
-        padding: 30px;
-        border-radius: 20px;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        width: 90%;
-        max-width: 400px;
-        backdrop-filter: blur(10px);
-      }
-
-      @media (max-width: 768px) {
-        .popup-content {
-          width: 95%;
-          padding: 20px;
-        }
-
-        .update-button {
-          padding: 10px 16px;
-          font-size: 0.9rem;
-        }
-
-        .top-container {
-          flex-direction: column;
-          align-items: center;
-        }
-
-        .info-box {
-          width: 100%;
-          max-width: 300px;
-        }
-
-        .cards-container {
-          margin-top: 20px;
-        }
-
-        .card {
-          width: 100%;
-          max-width: 300px;
-        }
-
-        header {
-          width: 100%;
-          text-align: center;
-        }
-
-        .logo {
-          font-size: 2rem;
-        }
-      }
-
-      @keyframes fadeInUp {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      .card {
-        animation: fadeInUp 0.6s ease backwards;
-      }
-
-      .card:nth-child(1) {
-        animation-delay: 0.2s;
-      }
-      .card:nth-child(2) {
-        animation-delay: 0.4s;
-      }
-      .card:nth-child(3) {
-        animation-delay: 0.6s;
-      }
-    </style>
+    <link rel="stylesheet" href="/css/styles.css" />
   </head>
   <body>
     <div class="top-container">
@@ -381,8 +30,12 @@
         <button id="update-info" class="update-button">
           <i class="fas fa-edit"></i> Update Information
         </button>
+        <button id="add-staff" class="update-button staff-button">
+          <i class="fas fa-user-plus"></i> Add Staff
+        </button>
       </div>
     </div>
+
     <div class="cards-container">
       <div class="card critical" data-type="critical">
         <h2 class="card-title">Critical</h2>
@@ -397,11 +50,12 @@
         <i class="fas fa-plus-circle plus-icon"></i>
       </div>
     </div>
+
     <a href="dashboard.html" class="dashboard-button">
       <i class="fas fa-chart-line"></i> View Dashboard
     </a>
 
-    <!-- Popup -->
+    <!-- Update Popup -->
     <div id="updatePopup" class="popup">
       <div class="popup-content">
         <span class="close-popup">&times;</span>
@@ -416,6 +70,38 @@
             <input type="number" id="newAdmissions" min="0" required />
           </div>
           <button type="submit" class="submit-button">Update</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Staff Popup Form -->
+    <div id="staffPopup" class="popup">
+      <div class="popup-content">
+        <span class="close-popup">&times;</span>
+        <h2>Add New Staff</h2>
+        <form id="staffForm" onsubmit="return false;">
+          <div class="form-group">
+            <label for="staffName">Name:</label>
+            <input type="text" id="staffName" required />
+          </div>
+          <div class="form-group">
+            <label for="staffDepartment">Department:</label>
+            <select id="staffDepartment" required>
+              <option value="">Select Department</option>
+              <option value="Catering">Catering</option>
+              <option value="Care">Care</option>
+              <option value="Admin">Admin</option>
+              <option value="Housekeeping">Housekeeping</option>
+              <option value="Reception">Reception</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="staffRole">Role:</label>
+            <select id="staffRole" required>
+              <option value="">Select Department First</option>
+            </select>
+          </div>
+          <button type="submit" class="submit-button">Add Staff</button>
         </form>
       </div>
     </div>
@@ -536,6 +222,169 @@
           console.log("InfoManager initialized successfully");
         } catch (error) {
           console.error("Failed to initialize InfoManager:", error);
+        }
+      });
+    </script>
+    <script>
+      // Existing staff roles object
+      const staffRoles = {
+        Catering: [
+          "Manager",
+          "Head Chef",
+          "Sous Chef",
+          "Bank Chef",
+          "Kitchen Assistant",
+          "Waiting Staff",
+        ],
+        Care: ["Manager", "Senior Carer", "Care Assistant"],
+        Admin: ["Admin"],
+        Housekeeping: ["Manager", "Assistant"],
+        Reception: ["Receptionist"],
+      };
+
+      // Staff popup elements
+      const addStaffButton = document.getElementById("add-staff");
+      const staffPopup = document.getElementById("staffPopup");
+      const staffForm = document.getElementById("staffForm");
+      const departmentSelect = document.getElementById("staffDepartment");
+      const roleSelect = document.getElementById("staffRole");
+
+      // Show staff popup
+      addStaffButton.addEventListener("click", () => {
+        staffPopup.classList.add("active");
+      });
+
+      // Close staff popup when clicking X
+      staffPopup.querySelector(".close-popup").addEventListener("click", () => {
+        staffPopup.classList.remove("active");
+      });
+
+      // Close staff popup when clicking outside
+      window.addEventListener("click", (event) => {
+        if (event.target === staffPopup) {
+          staffPopup.classList.remove("active");
+        }
+      });
+
+      // Update roles based on selected department
+      departmentSelect.addEventListener("change", function () {
+        const department = this.value;
+        const roles = staffRoles[department] || [];
+
+        // Clear and update role options
+        roleSelect.innerHTML = roles.length
+          ? roles
+              .map((role) => `<option value="${role}">${role}</option>`)
+              .join("")
+          : '<option value="">Select Department First</option>';
+      });
+
+      // Form validation function
+      function validateStaffForm() {
+        let isValid = true;
+        const fields = {
+          staffName: "Name is required",
+          staffDepartment: "Please select a department",
+          staffRole: "Please select a role",
+        };
+
+        // Clear previous errors
+        document.querySelectorAll(".form-group").forEach((group) => {
+          group.classList.remove("error");
+          const errorMessage = group.querySelector(".error-message");
+          if (errorMessage) errorMessage.remove();
+        });
+
+        // Check each field
+        for (const [fieldId, message] of Object.entries(fields)) {
+          const field = document.getElementById(fieldId);
+          if (!field.value.trim()) {
+            const formGroup = field.closest(".form-group");
+            formGroup.classList.add("error");
+
+            // Add error message
+            const errorDiv = document.createElement("div");
+            errorDiv.className = "error-message";
+            errorDiv.textContent = message;
+            formGroup.appendChild(errorDiv);
+
+            isValid = false;
+          }
+        }
+
+        return isValid;
+      }
+
+      // Success notification function
+      function showNotification(message, type = "success") {
+        const notification = document.createElement("div");
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+              <i class="fas ${
+                type === "success" ? "fa-check-circle" : "fa-exclamation-circle"
+              }"></i>
+              ${message}
+          `;
+        document.body.appendChild(notification);
+
+        // Remove notification after 3 seconds
+        setTimeout(() => {
+          notification.remove();
+        }, 3000);
+      }
+
+      // Handle form submission
+      staffForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        // Validate form before submission
+        if (!validateStaffForm()) {
+          return;
+        }
+
+        // Get the submit button
+        const submitButton = this.querySelector(".submit-button");
+        submitButton.disabled = true;
+        submitButton.innerHTML =
+          '<i class="fas fa-spinner fa-spin"></i> Adding...';
+
+        try {
+          const staffData = {
+            name: document.getElementById("staffName").value,
+            department: departmentSelect.value,
+            role: roleSelect.value,
+          };
+
+          const response = await fetch("/api/staff", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(staffData),
+          });
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            throw new Error(result.message || "Failed to add staff member");
+          }
+
+          // Show success notification
+          showNotification("Staff member added successfully!");
+
+          // Clear form and close popup
+          this.reset();
+          staffPopup.classList.remove("active");
+        } catch (error) {
+          console.error("Error:", error);
+          showNotification(
+            error.message || "Error adding staff member",
+            "error"
+          );
+        } finally {
+          // Reset button state
+          submitButton.disabled = false;
+          submitButton.innerHTML = "Add Staff";
         }
       });
     </script>

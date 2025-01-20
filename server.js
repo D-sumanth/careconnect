@@ -14,17 +14,18 @@ const db = mysql.createPool({
   connectionLimit: 10,
   queueLimit: 0,
 });
-
+const router = express.Router();
+const pool = require("./config/database");
 const app = express();
 
 // Test database connection
 db.getConnection()
-  .then(connection => {
-    console.log('Database connected successfully');
+  .then((connection) => {
+    console.log("Database connected successfully");
     connection.release();
   })
-  .catch(error => {
-    console.error('Error connecting to the database:', error);
+  .catch((error) => {
+    console.error("Error connecting to the database:", error);
   });
 
 // Middleware
@@ -62,13 +63,13 @@ app.get("/api/counts", async (req, res) => {
        ORDER BY created_at DESC 
        LIMIT 1`
     );
-    console.log('Fetched rows:', rows);
+    console.log("Fetched rows:", rows);
 
     if (rows.length === 0) {
-      console.log('No counts found, returning defaults');
+      console.log("No counts found, returning defaults");
       return res.json({ in_house: 0, new_admissions: 0 });
     }
-    console.log('Returning counts:', rows[0]);
+    console.log("Returning counts:", rows[0]);
     res.json(rows[0]);
   } catch (error) {
     console.error("Error fetching counts:", error);
@@ -83,12 +84,12 @@ app.get("/api/counts", async (req, res) => {
 // Update counts
 app.post("/api/update-counts", async (req, res) => {
   try {
-    console.log('Received update request:', req.body);
+    console.log("Received update request:", req.body);
     const { inHouse, newAdmissions } = req.body;
 
     // Input validation
     if (typeof inHouse !== "number" || typeof newAdmissions !== "number") {
-      console.log('Invalid input types:', { inHouse, newAdmissions });
+      console.log("Invalid input types:", { inHouse, newAdmissions });
       return res.status(400).json({
         success: false,
         message: "Invalid input: values must be numbers",
@@ -107,7 +108,7 @@ app.post("/api/update-counts", async (req, res) => {
        VALUES (?, ?)`,
       [inHouse, newAdmissions]
     );
-    console.log('Update successful:', result);
+    console.log("Update successful:", result);
 
     res.json({
       success: true,
@@ -202,6 +203,48 @@ app.post("/api/acknowledge", async (req, res) => {
   } catch (error) {
     console.error("Error saving acknowledgment:", error);
     res.status(500).json({ error: "Failed to save acknowledgment" });
+  }
+});
+
+// Add new staff member
+app.post("/api/staff", async (req, res) => {
+  try {
+    const { name, department, role } = req.body;
+
+    // Input validation
+    if (!name || !department || !role) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required",
+      });
+    }
+
+    const query = "INSERT INTO staff (name, department, role) VALUES (?, ?, ?)";
+    const [result] = await pool.execute(query, [name, department, role]);
+
+    res.json({
+      success: true,
+      message: "Staff member added successfully",
+      staffId: result.insertId,
+    });
+  } catch (error) {
+    console.error("Error adding staff:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error adding staff member",
+      error: error.message,
+    });
+  }
+});
+
+// Get all staff members
+app.get("/api/staff", async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT * FROM staff ORDER BY name");
+    res.json(rows);
+  } catch (error) {
+    console.error("Error fetching staff:", error);
+    res.status(500).json({ error: "Failed to fetch staff" });
   }
 });
 
