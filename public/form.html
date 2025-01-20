@@ -24,37 +24,43 @@
       </header>
     </div>
 
-    <!-- Replace only the form-container div in the form.html with this code -->
     <div class="form-container">
       <form id="infoForm" onsubmit="submitForm(event)">
         <div class="form-group">
           <label for="home">Home</label>
-          <input
-            type="text"
-            id="home"
-            placeholder="Enter home details"
-            required
-          />
+          <select id="home" required>
+            <option value="">Select home</option>
+            <option value="Home1">Home1</option>
+            <option value="Home2">Home2</option>
+            <option value="Home3">Home3</option>
+            <option value="Home4">Home4</option>
+          </select>
         </div>
 
         <div class="form-group">
           <label for="department">Department</label>
-          <input
-            type="text"
-            id="department"
-            placeholder="Enter department"
-            required
-          />
+          <select id="department" required>
+            <option value="">Select department</option>
+            <option value="Dept 1">Dept 1</option>
+            <option value="Dept 2">Dept 2</option>
+            <option value="Dept 3">Dept 3</option>
+          </select>
         </div>
 
-        <div class="form-group">
-          <label for="nameDesignation">Name-Designation</label>
-          <input
-            type="text"
-            id="nameDesignation"
-            placeholder="Enter name and designation"
-            required
-          />
+        <div class="form-group name-designation-group">
+          <div class="name-field">
+            <label for="name">Name</label>
+            <input type="text" id="name" placeholder="Enter name" required />
+          </div>
+          <div class="designation-field">
+            <label for="designation">Designation</label>
+            <input
+              type="text"
+              id="designation"
+              placeholder="Enter designation"
+              required
+            />
+          </div>
         </div>
 
         <div class="form-group">
@@ -68,21 +74,11 @@
 
         <div class="form-group">
           <label for="authorizedBy">Authorized By</label>
-          <input
-            type="text"
-            id="authorizedBy"
-            placeholder="Enter authorizing person's name"
-            required
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="state">State of Information</label>
-          <select id="state" required>
-            <option value="">Select state</option>
-            <option value="Critical">Critical</option>
-            <option value="Routine">Routine</option>
-            <option value="Event-Based">Event-Based</option>
+          <select id="authorizedBy" required>
+            <option value="">Select authorizing person</option>
+            <option value="Manager 1">Manager 1</option>
+            <option value="Manager 2">Manager 2</option>
+            <option value="Manager 3">Manager 3</option>
           </select>
         </div>
 
@@ -117,38 +113,68 @@
     <script>
       // Get the type from URL parameters
       const urlParams = new URLSearchParams(window.location.search);
-      const type = urlParams.get("type");
+      const type = urlParams.get("type") || "routine"; // Default to routine if no type specified
 
       // Add the type class to body
       document.body.classList.add(type);
 
-      // Set the correct state in the dropdown
-      document.getElementById("state").value =
-        type.charAt(0).toUpperCase() + type.slice(1);
-
-      // Form submission handler
-      document
-        .getElementById("infoForm")
-        .addEventListener("submit", function (e) {
-          e.preventDefault();
-          // Add form submission logic here
-          alert("Form submitted successfully!");
-        });
-
       // Make chips selectable
       document.querySelectorAll(".option-chip").forEach((chip) => {
         chip.addEventListener("click", function () {
-          this.classList.toggle("selected");
-          if (this.classList.contains("selected")) {
-            this.style.background = getComputedStyle(document.body).background;
-            this.style.color = "white";
+          if (this.textContent === "All") {
+            // Handle 'All' chip
+            const isSelected = !this.classList.contains("selected");
+            document.querySelectorAll(".option-chip").forEach((c) => {
+              if (isSelected) {
+                c.classList.add("selected");
+              } else {
+                c.classList.remove("selected");
+              }
+            });
           } else {
-            this.style.background = "white";
-            this.style.color = "";
+            // Handle other chips
+            this.classList.toggle("selected");
+
+            // Check if all individual chips are selected
+            const allChip = document.querySelector(".option-chip:first-child");
+            const otherChips = document.querySelectorAll(
+              ".option-chip:not(:first-child)"
+            );
+            const allSelected = Array.from(otherChips).every((c) =>
+              c.classList.contains("selected")
+            );
+
+            if (allSelected) {
+              allChip.classList.add("selected");
+            } else {
+              allChip.classList.remove("selected");
+            }
           }
         });
       });
+
+      // Form submission handler
+      async function submitForm(event) {
+        event.preventDefault();
+
+        // Get selected departments
+        const selectedDepartments = Array.from(
+          document.querySelectorAll(".option-chip.selected")
+        ).map((chip) => chip.textContent);
+
+        const formData = {
+          home: document.getElementById("home").value,
+          department: document.getElementById("department").value,
+          name: document.getElementById("name").value,
+          designation: document.getElementById("designation").value,
+          information: document.getElementById("information").value,
+          authorizedBy: document.getElementById("authorizedBy").value,
+          sendTo: selectedDepartments,
+        };
+
+        console.log("Form data:", formData);
+        alert("Form submitted successfully!");
+      }
     </script>
-    <script src="/js/form.js"></script>
   </body>
 </html>
