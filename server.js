@@ -55,10 +55,11 @@ app.get("/api/test", async (req, res) => {
 });
 
 // Get current counts
+// Get current counts
 app.get("/api/counts", async (req, res) => {
   try {
     const [rows] = await db.query(
-      `SELECT in_house, new_admissions 
+      `SELECT in_house, new_admissions, created_at, updated_at
        FROM counts 
        ORDER BY created_at DESC 
        LIMIT 1`
@@ -66,9 +67,18 @@ app.get("/api/counts", async (req, res) => {
     console.log("Fetched rows:", rows);
 
     if (rows.length === 0) {
-      console.log("No counts found, returning defaults");
-      return res.json({ in_house: 0, new_admissions: 0 });
+      // If no counts exist, create initial record
+      const [insertResult] = await db.query(
+        `INSERT INTO counts (in_house, new_admissions) VALUES (0, 0)`
+      );
+      return res.json({
+        in_house: 0,
+        new_admissions: 0,
+        created_at: new Date(),
+        updated_at: new Date(),
+      });
     }
+
     console.log("Returning counts:", rows[0]);
     res.json(rows[0]);
   } catch (error) {
@@ -117,6 +127,8 @@ app.post("/api/update-counts", async (req, res) => {
         id: result.insertId,
         in_house: inHouse,
         new_admissions: newAdmissions,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
     });
   } catch (error) {
@@ -124,6 +136,26 @@ app.post("/api/update-counts", async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error updating counts",
+      error: error.message,
+    });
+  }
+});
+
+// Get counts history
+app.get("/api/counts/history", async (req, res) => {
+  try {
+    const [rows] = await db.query(
+      `SELECT in_house, new_admissions, created_at, updated_at
+       FROM counts 
+       ORDER BY created_at DESC 
+       LIMIT 10`
+    );
+    res.json(rows);
+  } catch (error) {
+    console.error("Error fetching counts history:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching counts history",
       error: error.message,
     });
   }
