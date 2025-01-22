@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const mysql = require("mysql2/promise");
+const apiRoutes = require('./routes/api');
 require("dotenv").config();
 
 // Create database connection pool
@@ -33,6 +34,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
+app.use('/api', apiRoutes);
 
 // Routes
 
@@ -54,7 +56,6 @@ app.get("/api/test", async (req, res) => {
   }
 });
 
-// Get current counts
 // Get current counts
 app.get("/api/counts", async (req, res) => {
   try {

@@ -76,6 +76,26 @@ label {
   font-weight: 600;
 }
 
+select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: white;
+  cursor: pointer;
+}
+
+select:focus {
+  outline: none;
+  border-color: #2196f3;
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+}
+
+select option {
+  padding: 8px;
+}
+
 input[type="text"],
 textarea,
 select {

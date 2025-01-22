@@ -82,17 +82,19 @@
           </select>
         </div>
 
-        <div class="send-to-box">
-          <label>Send To</label>
-          <div class="send-to-options">
-            <div class="option-chip">All</div>
-            <div class="option-chip">Catering</div>
-            <div class="option-chip">Outreach</div>
-            <div class="option-chip">Reception</div>
-            <div class="option-chip">Dementia</div>
-            <div class="option-chip">Housekeeping</div>
-            <div class="option-chip">Admin Office</div>
-          </div>
+        <!-- Replace the send-to-box div with this -->
+        <div class="form-group">
+          <label for="sendTo">Send To</label>
+          <select id="sendTo" required>
+            <option value="">Select department</option>
+            <option value="All">All</option>
+            <option value="Catering">Catering</option>
+            <option value="Outreach">Outreach</option>
+            <option value="Reception">Reception</option>
+            <option value="Dementia">Dementia</option>
+            <option value="Housekeeping">Housekeeping</option>
+            <option value="Admin Office">Admin Office</option>
+          </select>
         </div>
 
         <div class="button-group">
@@ -154,26 +156,80 @@
       });
 
       // Form submission handler
+      // Add this to your form.html or a separate JavaScript file
       async function submitForm(event) {
         event.preventDefault();
 
-        // Get selected departments
-        const selectedDepartments = Array.from(
-          document.querySelectorAll(".option-chip.selected")
-        ).map((chip) => chip.textContent);
+        // Get the type from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const formType = urlParams.get("type") || "routine"; // Default to routine if no type specified
+
+        // Generate job ID
+        const now = new Date();
+        const year = now.getFullYear().toString().slice(-2);
+        const month = String(now.getMonth() + 1).padStart(2, "0");
+        const day = String(now.getDate()).padStart(2, "0");
+        const random = Math.floor(Math.random() * 10000)
+          .toString()
+          .padStart(4, "0");
+        const jobId = `J${year}${month}${day}${random}`;
 
         const formData = {
+          job_id: jobId,
           home: document.getElementById("home").value,
           department: document.getElementById("department").value,
           name: document.getElementById("name").value,
           designation: document.getElementById("designation").value,
           information: document.getElementById("information").value,
-          authorizedBy: document.getElementById("authorizedBy").value,
-          sendTo: selectedDepartments,
+          authorized_by: document.getElementById("authorizedBy").value,
+          send_to: document.getElementById("sendTo").value, // Direct value from dropdown
+          type: formType, // Use the type from URL
+          status: "pending",
         };
 
-        console.log("Form data:", formData);
-        alert("Form submitted successfully!");
+        try {
+          const response = await fetch("/api/save-info", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+          });
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            throw new Error(result.message || "Failed to save information");
+          }
+
+          alert("Information submitted successfully!");
+          document.getElementById("infoForm").reset();
+        } catch (error) {
+          console.error("Error submitting form:", error);
+          alert(
+            error.message || "Failed to submit information. Please try again."
+          );
+        }
+      }
+      // Add this to display the form type in the UI (optional)
+      document.addEventListener("DOMContentLoaded", () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const formType = urlParams.get("type") || "routine";
+
+        // You could add this to show what type of form is being filled
+        const formTitle = document.querySelector(".form-title");
+        if (formTitle) {
+          formTitle.textContent = `${
+            formType.charAt(0).toUpperCase() + formType.slice(1)
+          } Information Form`;
+        }
+      });
+
+      // Function to generate a unique job ID
+      function generateJobId() {
+        const timestamp = new Date().getTime();
+        const random = Math.floor(Math.random() * 1000);
+        return `JOB${timestamp}${random}`;
       }
     </script>
   </body>

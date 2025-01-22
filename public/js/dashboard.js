@@ -1,73 +1,54 @@
 async function fetchInformation() {
   try {
-    const response = await fetch("/api/forms");
-    const data = await response.json();
+      const response = await fetch("/api/forms");
+      const data = await response.json();
 
-    // Clear existing content
-    document.getElementById("criticalContent").innerHTML = "";
-    document.getElementById("routineContent").innerHTML = "";
-    document.getElementById("eventContent").innerHTML = "";
+      // Clear existing content
+      document.getElementById("criticalContent").innerHTML = "";
+      document.getElementById("routineContent").innerHTML = "";
+      document.getElementById("eventContent").innerHTML = "";
 
-    // Process and display each piece of information
-    data.forEach((info) => {
-      const infoBox = createInfoBox(info);
+      // Process and display each piece of information
+      data.forEach((info) => {
+          const infoBox = createInfoBox(info);
 
-      switch (info.state_type.toLowerCase()) {
-        case "critical":
-          document.getElementById("criticalContent").appendChild(infoBox);
-          break;
-        case "routine":
-          document.getElementById("routineContent").appendChild(infoBox);
-          break;
-        case "event-based":
-          document.getElementById("eventContent").appendChild(infoBox);
-          break;
-      }
-    });
+          switch (info.type.toLowerCase()) {
+              case "critical":
+                  document.getElementById("criticalContent").appendChild(infoBox);
+                  break;
+              case "routine":
+                  document.getElementById("routineContent").appendChild(infoBox);
+                  break;
+              case "event-based":
+                  document.getElementById("eventContent").appendChild(infoBox);
+                  break;
+          }
+      });
   } catch (error) {
-    console.error("Error fetching information:", error);
+      console.error("Error fetching information:", error);
   }
 }
 
 function createInfoBox(info) {
   const box = document.createElement("div");
-  box.className = "info-box-item";
-  box.dataset.id = info.id;
-
-  const maxLength = 100;
-  const truncatedText =
-    info.information.length > maxLength
-      ? info.information.substring(0, maxLength) + "..."
-      : info.information;
+  box.className = "info-item";
+  
+  // Format the date
+  const date = new Date(info.created_at).toLocaleString();
 
   box.innerHTML = `
-        <div class="info-header">
-            <span class="info-date">${new Date(
-              info.created_at
-            ).toLocaleDateString()}</span>
-            <span class="info-time">${new Date(
-              info.created_at
-            ).toLocaleTimeString()}</span>
-        </div>
-        <div class="info-body">
-            <p class="info-text">${truncatedText}</p>
-            <div class="info-meta">
-                <span class="info-home">${info.home}</span>
-                <span class="info-department">${info.department}</span>
-            </div>
-        </div>
-        <div class="info-footer">
-            <span class="info-author">By: ${info.name_designation}</span>
-            <button class="view-more-btn" onclick="showModal('${encodeURIComponent(
-              JSON.stringify(info)
-            )}')">
-                View More
-            </button>
-        </div>
-    `;
-
-  // Check acknowledgment status
-  checkAcknowledgmentStatus(info.id, box);
+      <div class="info-header">
+          <span class="job-id">${info.job_id}</span>
+          <span class="date">${date}</span>
+      </div>
+      <div class="info-body">
+          <p><strong>From:</strong> ${info.department} (${info.home})</p>
+          <p><strong>By:</strong> ${info.name} - ${info.designation}</p>
+          <p><strong>Information:</strong> ${info.information}</p>
+          <p><strong>Authorized By:</strong> ${info.authorized_by}</p>
+          <p><strong>Send To:</strong> ${info.send_to}</p>
+      </div>
+  `;
 
   return box;
 }
@@ -172,18 +153,12 @@ async function loadAcknowledgments(infoId, container) {
       '<p class="error-message">Error loading XXXXXXXXXXXXXXX</p>';
   }
 }
-document.addEventListener('DOMContentLoaded', async () => {
-  // Any dashboard-specific initialization code
-  
-  // Set up automatic refresh of counts every 30 seconds
-  setInterval(() => {
-    InfoManager.fetchAndDisplayCounts();
-  }, 30000);
-});
+// Auto-refresh the dashboard every 30 seconds
+function initDashboard() {
+  fetchInformation(); // Initial fetch
+  setInterval(fetchInformation, 30000); // Refresh every 30 seconds
+}
 
+// Initialize when the page loads
+document.addEventListener('DOMContentLoaded', initDashboard);
 
-// Initial load
-fetchInformation();
-
-// Refresh information periodically (every 30 seconds)
-setInterval(fetchInformation, 30000);

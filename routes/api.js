@@ -112,37 +112,38 @@ router.get("/counts/history", async (req, res) => {
 router.post("/save-info", async (req, res) => {
   try {
     const {
+      job_id,
       home,
       department,
-      nameDesignation,
+      name,
+      designation,
       information,
-      authorizedBy,
-      state,
-      sendTo,
+      authorized_by,
+      send_to, // This will now be a simple string
+      type,
+      status,
     } = req.body;
 
-    console.log("Received data:", req.body);
-
     const query = `
-            INSERT INTO information 
-            (home, department, name_designation, information, authorized_by, state_type, send_to) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        `;
+      INSERT INTO form_submissions 
+      (job_id, home, department, name, designation, information, authorized_by, send_to, type, status) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
 
     const values = [
+      job_id,
       home,
       department,
-      nameDesignation,
+      name,
+      designation,
       information,
-      authorizedBy,
-      state,
-      sendTo,
+      authorized_by,
+      send_to, // Will be inserted as a plain string
+      type,
+      status,
     ];
 
-    console.log("Executing query:", { query, values });
-
     const [result] = await pool.execute(query, values);
-    console.log("Insert result:", result);
 
     res.json({
       success: true,
