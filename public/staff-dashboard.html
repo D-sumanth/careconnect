@@ -23,12 +23,13 @@
         </h1>
       </header>
 
+      <!-- In dashboard.html, replace the static count -->
       <div class="info-box">
         <p>Date: <span id="current-date"></span></p>
-        <!-- <p>Time: <span id="current-time"></span></p> -->
-        <p>In House: <span data-info="in-house">1</span></p>
-        <p>New Admissions: <span data-info="new-admissions">1</span></p>
+        <p>In Home: <span id="in-house-display">0</span></p>
+        <p>New Admissions: <span id="new-admissions-display">0</span></p>
       </div>
+    </div>
 
     <div class="main-content">
       <div class="info-block critical">
@@ -87,10 +88,10 @@
     </script>
     <script src="/js/staffdashboard.js"></script>
     <script src="/js/shared.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    InfoManager.init();
-  });
-</script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        InfoManager.init();
+      });
+    </script>
   </body>
 </html>

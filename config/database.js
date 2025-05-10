@@ -6,7 +6,7 @@ const pool = mysql
     host: process.env.DB_HOST || "localhost",
     user: process.env.DB_USER || "root",
     password: process.env.DB_PASSWORD || "your_password", // Replace with your actual MySQL password
-    database: process.env.DB_NAME || "careconnect",
+    database: process.env.DB_NAME || "careconnect_v2",
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
