@@ -30,7 +30,7 @@ $env:ConnectionStrings__DefaultConnection="Host=your-neon-host;Database=neondb;U
 $env:FirstAdminSetup__Token="change-this-to-a-long-random-one-time-token"
 ```
 
-For local development, the app falls back to an in-memory database if `ConnectionStrings:DefaultConnection` is empty. Development seed data is created automatically:
+For local development, the app falls back to an in-memory database if `ConnectionStrings:DefaultConnection` is empty. Outside Development, `ConnectionStrings__DefaultConnection` is required and the app will not start without it. Development seed data is created automatically:
 
 - Admin: `admin@careconnect.local` / `Admin123!`
 - Department lead: `lead@careconnect.local` / `Lead123!`
@@ -42,10 +42,11 @@ Change or disable these before using shared environments.
 Production does not create demo users. To create the first admin account:
 
 1. Add an App Service setting named `FirstAdminSetup__Token` with a long random value.
-2. Restart the app.
-3. Open `/Account/Setup?token=YOUR_TOKEN`.
-4. Create the admin account.
-5. Remove `FirstAdminSetup__Token` from App Service settings after the admin is created.
+2. Confirm `ConnectionStrings__DefaultConnection` is configured and the app can reach Neon.
+3. Restart the app.
+4. Open `/Account/Setup?token=YOUR_TOKEN`.
+5. Create the admin account.
+6. Remove `FirstAdminSetup__Token` from App Service settings after the admin is created.
 
 The setup page is disabled automatically once an `Admin` user exists.
 

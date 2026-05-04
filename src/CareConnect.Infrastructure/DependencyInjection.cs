@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace CareConnect.Infrastructure;
 
@@ -18,6 +19,15 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
+        var environmentName = configuration["ASPNETCORE_ENVIRONMENT"] ?? Environments.Production;
+
+        if (string.IsNullOrWhiteSpace(connectionString) &&
+            !string.Equals(environmentName, Environments.Development, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException(
+                "ConnectionStrings:DefaultConnection is required outside Development. Configure ConnectionStrings__DefaultConnection in the hosting environment.");
+        }
+
         services.AddDbContext<AppDbContext>(options =>
         {
             if (!string.IsNullOrWhiteSpace(connectionString))

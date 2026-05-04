@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Hosting;
 
 namespace CareConnect.Tests;
 
@@ -8,7 +10,13 @@ public sealed class AuthorizationTests : IClassFixture<WebApplicationFactory<Pro
 
     public AuthorizationTests(WebApplicationFactory<Program> factory)
     {
-        _factory = factory.WithWebHostBuilder(_ => { });
+        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", Environments.Development);
+        Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", Environments.Development);
+
+        _factory = factory.WithWebHostBuilder(builder =>
+        {
+            builder.UseEnvironment(Environments.Development);
+        });
     }
 
     [Theory]
