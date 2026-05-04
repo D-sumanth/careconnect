@@ -1,0 +1,54 @@
+@page
+@model CareConnect.Web.Pages.Account.SetupModel
+@{
+    ViewData["Title"] = "First admin setup";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <section class="content-panel">
+            <p class="eyebrow mb-2">One-time setup</p>
+            <h1 class="section-title mb-3">Create the first admin account</h1>
+
+            @if (!Model.CanSetup)
+            {
+                <div class="alert alert-warning mb-0">@Model.StatusMessage</div>
+            }
+            else
+            {
+                <p class="text-muted">
+                    This page is available only while there are no admin users and requires the setup token configured in hosting.
+                </p>
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="mb-3"></div>
+                    <input type="hidden" asp-for="Input.Token" />
+                    <div class="mb-3">
+                        <label asp-for="Input.DisplayName" class="form-label"></label>
+                        <input asp-for="Input.DisplayName" class="form-control" autocomplete="name" />
+                        <span asp-validation-for="Input.DisplayName"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.Email" class="form-label"></label>
+                        <input asp-for="Input.Email" class="form-control" autocomplete="username" />
+                        <span asp-validation-for="Input.Email"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.Password" class="form-label"></label>
+                        <input asp-for="Input.Password" class="form-control" autocomplete="new-password" />
+                        <span asp-validation-for="Input.Password"></span>
+                    </div>
+                    <div class="mb-4">
+                        <label asp-for="Input.ConfirmPassword" class="form-label"></label>
+                        <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" />
+                        <span asp-validation-for="Input.ConfirmPassword"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary touch-button w-100">Create admin account</button>
+                </form>
+            }
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

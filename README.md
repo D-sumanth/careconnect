@@ -27,6 +27,7 @@ Required production value:
 
 ```powershell
 $env:ConnectionStrings__DefaultConnection="Host=your-neon-host;Database=neondb;Username=neondb_owner;Password=...;SSL Mode=Require;Trust Server Certificate=true"
+$env:FirstAdminSetup__Token="change-this-to-a-long-random-one-time-token"
 ```
 
 For local development, the app falls back to an in-memory database if `ConnectionStrings:DefaultConnection` is empty. Development seed data is created automatically:
@@ -35,6 +36,18 @@ For local development, the app falls back to an in-memory database if `Connectio
 - Department lead: `lead@careconnect.local` / `Lead123!`
 
 Change or disable these before using shared environments.
+
+## First Production Admin
+
+Production does not create demo users. To create the first admin account:
+
+1. Add an App Service setting named `FirstAdminSetup__Token` with a long random value.
+2. Restart the app.
+3. Open `/Account/Setup?token=YOUR_TOKEN`.
+4. Create the admin account.
+5. Remove `FirstAdminSetup__Token` from App Service settings after the admin is created.
+
+The setup page is disabled automatically once an `Admin` user exists.
 
 ## Local Run
 
