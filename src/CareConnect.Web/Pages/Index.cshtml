@@ -1,0 +1,45 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Care home communication";
+}
+
+<section class="hero-panel">
+    <div class="row align-items-center g-4">
+        <div class="col-lg-7">
+            <p class="eyebrow mb-2">Care home acknowledgement workflow</p>
+            <h1 class="page-title mb-3">Clear updates. Named acknowledgements. Admin-ready tracking.</h1>
+            <p class="lead-copy mb-4">
+                CareConnect helps department leads share important information on a team device and capture who acknowledged it, when, and under which department.
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    @if (User.IsInRole(CareConnectRoles.Admin))
+                    {
+                        <a class="btn btn-primary touch-button px-4" asp-page="/Admin/Index">Open admin console</a>
+                    }
+                    @if (User.IsInRole(CareConnectRoles.DepartmentLead))
+                    {
+                        <a class="btn btn-outline-primary touch-button px-4" asp-page="/Lead/Index">Open lead dashboard</a>
+                    }
+                }
+                else
+                {
+                    <a class="btn btn-primary touch-button px-4" asp-page="/Account/Login">Sign in</a>
+                }
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="content-panel">
+                <h2 class="section-title">Built for busy teams</h2>
+                <ul class="mb-0 lead-copy">
+                    <li>Large, readable notices for shared devices</li>
+                    <li>Typed staff acknowledgement on the lead's device</li>
+                    <li>Department and lead attribution on every record</li>
+                    <li>Audit log and CSV export for admin follow-up</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>

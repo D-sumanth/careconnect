@@ -1,58 +1,100 @@
 # CareConnect
 
-CareConnect is a centralized communication system designed specifically for care homes. It aims to streamline and prioritize communications related to resident care, ensuring that critical information about health, dietary needs, and general well-being is efficiently relayed to the relevant departments.
+CareConnect is a care-home communication and acknowledgement platform. Department leads sign in on a shared/team device, present important notices to their teams, and record typed staff acknowledgements. Admin users can manage departments, users, notices, acknowledgement records, CSV exports, and audit logs.
 
-## Table of Contents
+## Stack
 
-- [Installation](#installation)
-- [Usage](#usage)
-- [Features](#features)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
+- ASP.NET Core 9 Razor Pages
+- ASP.NET Core Identity with role-based authorization
+- Entity Framework Core
+- PostgreSQL via Npgsql, ready for Neon
+- Serilog console logging
+- xUnit tests
 
-## Installation
+## Solution Structure
 
-Follow these steps to install CareConnect:
+- `src/CareConnect.Web` - Razor Pages UI, auth flow, admin and lead pages
+- `src/CareConnect.Application` - service contracts and DTOs
+- `src/CareConnect.Domain` - entities, roles, and enums
+- `src/CareConnect.Infrastructure` - EF Core, Identity, services, seed data
+- `tests/CareConnect.Tests` - unit and integration tests
 
-1. Clone the repository:
-`git clone https://github.com/yourusername/careconnect.git`
+## Required Configuration
 
-2. Navigate to the project directory:
-`cd careconnect`
+Do not commit secrets. Configure the database through environment variables, app settings in the hosting platform, or user secrets.
 
-3. Install dependencies:
-`npm install`
+Required production value:
 
+```powershell
+$env:ConnectionStrings__DefaultConnection="Host=your-neon-host;Database=neondb;Username=neondb_owner;Password=...;SSL Mode=Require;Trust Server Certificate=true"
+```
 
-## Usage
+For local development, the app falls back to an in-memory database if `ConnectionStrings:DefaultConnection` is empty. Development seed data is created automatically:
 
-To start the system, run the following command:
+- Admin: `admin@careconnect.local` / `Admin123!`
+- Department lead: `lead@careconnect.local` / `Lead123!`
 
-`npm start`
+Change or disable these before using shared environments.
 
+## Local Run
 
-This will start the CareConnect application on your local server. Access the system through your web browser at `http://localhost:3000`.
+```powershell
+dotnet restore
+dotnet build
+dotnet run --project src/CareConnect.Web --no-build
+```
 
-## Features
+Open the printed localhost URL and sign in with one of the development users.
 
-- **Critical Alerts**: Immediate notifications about urgent health and dietary requirements.
-- **Priority Alerts**: Important reminders for scheduled medications and compliance checks.
-- **Informational Alerts**: Routine updates about daily activities and non-urgent matters.
-- **Feedback System**: Allows staff to provide feedback on the communication effectiveness.
+## EF Core and Neon PostgreSQL
 
-## Contributing
+Install the EF tool if needed:
 
-We welcome contributions to CareConnect. Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+```powershell
+dotnet tool install --global dotnet-ef
+```
 
-## License
+Create a migration:
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+```powershell
+dotnet ef migrations add InitialCreate --project src/CareConnect.Infrastructure --startup-project src/CareConnect.Web
+```
 
-## Contact
+Apply migrations:
 
-If you have any questions or feedback, please contact the project team at contact@careconnect.com.
+```powershell
+dotnet ef database update --project src/CareConnect.Infrastructure --startup-project src/CareConnect.Web
+```
 
----
+For Neon, use the pooled connection string for normal app traffic. If you use a separate direct connection for migrations, configure it in your deployment pipeline rather than committing it.
 
-For more information, please visit our [official website](http://www.careconnect.com).
+## Security Notes
+
+- HTTPS redirection and HSTS are enabled outside development.
+- Identity cookies are HTTP-only and SameSite=Lax.
+- Razor forms use antiforgery protection.
+- Admin pages require the `Admin` role.
+- Lead pages require the `DepartmentLead` role.
+- Audit logs avoid raw IP storage by hashing IP addresses.
+- Passwords are hashed by ASP.NET Core Identity.
+
+## Testing
+
+```powershell
+dotnet test
+```
+
+Current coverage includes acknowledgement creation, duplicate team-member acknowledgement behavior, audit logging, anonymous redirects for protected pages, and the health endpoint.
+
+## Azure App Service Deployment Notes
+
+1. Publish `src/CareConnect.Web`.
+2. Configure `ConnectionStrings__DefaultConnection` as an App Service setting.
+3. Set `ASPNETCORE_ENVIRONMENT=Production`.
+4. Run EF migrations from CI/CD or a controlled deployment step.
+5. Enable HTTPS only.
+6. Configure log streaming or Application Insights as needed.
+
+## Legacy Node App
+
+The original Express/static HTML files remain in the repository as migration reference. The ASP.NET Core solution is the production path going forward.

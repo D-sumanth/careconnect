@@ -1,0 +1,64 @@
+@page "{id:guid}"
+@model CareConnect.Web.Pages.Lead.NoticeModel
+@{
+    ViewData["Title"] = Model.Notice?.Title ?? "Notice";
+}
+
+@if (Model.Notice is null)
+{
+    <section class="content-panel">
+        <h1 class="section-title">Notice unavailable</h1>
+        <p class="lead-copy mb-0">This notice is not assigned to one of your lead departments.</p>
+    </section>
+}
+else
+{
+    <a asp-page="/Lead/Index" class="btn btn-link px-0 mb-3">Back to notices</a>
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <article class="content-panel">
+                <div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
+                    <span class="badge @Model.Notice.BadgeClass">@Model.Notice.Type</span>
+                    <span class="text-muted small">Authorized by @Model.Notice.AuthorizedBy</span>
+                </div>
+                <h1 class="section-title">@Model.Notice.Title</h1>
+                <p class="lead-copy">@Model.Notice.Summary</p>
+                <hr />
+                <div class="fs-5 lh-lg" style="white-space: pre-wrap">@Model.Notice.Body</div>
+            </article>
+        </div>
+        <div class="col-lg-5">
+            <section class="content-panel">
+                <h2 class="section-title">Record acknowledgement</h2>
+                <p class="text-muted">Ask each team member to type their name after reviewing the notice.</p>
+                @if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
+                {
+                    <div class="alert alert-success">@Model.SuccessMessage</div>
+                }
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="mb-3"></div>
+                    <div class="mb-3">
+                        <label asp-for="Input.DepartmentId" class="form-label"></label>
+                        <select asp-for="Input.DepartmentId" asp-items="Model.DepartmentOptions" class="form-select"></select>
+                        <span asp-validation-for="Input.DepartmentId"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.StaffMemberName" class="form-label"></label>
+                        <input asp-for="Input.StaffMemberName" class="form-control form-control-lg" autocomplete="off" />
+                        <span asp-validation-for="Input.StaffMemberName"></span>
+                    </div>
+                    <div class="mb-4">
+                        <label asp-for="Input.SignatureText" class="form-label"></label>
+                        <input asp-for="Input.SignatureText" class="form-control form-control-lg" autocomplete="off" />
+                        <span asp-validation-for="Input.SignatureText"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary touch-button w-100">Submit acknowledgement</button>
+                </form>
+            </section>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,40 @@
+@page
+@model CareConnect.Web.Pages.Admin.IndexModel
+@{
+    ViewData["Title"] = "Admin overview";
+}
+
+<partial name="_AdminNav" />
+
+<section class="content-panel mb-4">
+    <p class="eyebrow mb-2">Admin console</p>
+    <h1 class="section-title mb-2">CareConnect overview</h1>
+    <p class="lead-copy mb-0">Track published notices, departments, acknowledgements, and recent compliance activity.</p>
+</section>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="stat-card"><div class="text-muted">Departments</div><div class="display-6 fw-bold">@Model.Summary.DepartmentCount</div></div></div>
+    <div class="col-md-3"><div class="stat-card"><div class="text-muted">Users</div><div class="display-6 fw-bold">@Model.Summary.UserCount</div></div></div>
+    <div class="col-md-3"><div class="stat-card"><div class="text-muted">Published notices</div><div class="display-6 fw-bold">@Model.Summary.PublishedNoticeCount</div></div></div>
+    <div class="col-md-3"><div class="stat-card"><div class="text-muted">Acknowledgements</div><div class="display-6 fw-bold">@Model.Summary.AcknowledgementCount</div></div></div>
+</div>
+
+<section class="content-panel">
+    <h2 class="section-title">Recent acknowledgements</h2>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead><tr><th>Notice</th><th>Department</th><th>Staff member</th><th>When</th></tr></thead>
+            <tbody>
+                @foreach (var row in Model.RecentAcknowledgements)
+                {
+                    <tr>
+                        <td>@row.NoticeTitle</td>
+                        <td>@row.DepartmentName</td>
+                        <td>@row.StaffMemberName</td>
+                        <td>@row.AcknowledgedAt.ToLocalTime().ToString("g")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>

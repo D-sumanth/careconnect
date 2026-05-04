@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CareConnect</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="app-header">
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <div class="container-fluid app-shell">
+                <a class="navbar-brand brand" asp-page="/Index">CareConnect</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse justify-content-between">
+                    <ul class="navbar-nav gap-lg-2">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-page="/Index">Home</a>
+                        </li>
+                        @if (User.IsInRole(CareConnectRoles.DepartmentLead))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-page="/Lead/Index">Lead dashboard</a>
+                            </li>
+                        }
+                        @if (User.IsInRole(CareConnectRoles.Admin))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-page="/Admin/Index">Admin</a>
+                            </li>
+                        }
+                    </ul>
+                    <ul class="navbar-nav align-items-lg-center gap-lg-2">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item text-muted small px-lg-2">@User.Identity.Name</li>
+                            <li class="nav-item">
+                                <form method="post" asp-page="/Account/Logout">
+                                    <button class="btn btn-link nav-link" type="submit">Sign out</button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="btn btn-primary btn-sm" asp-page="/Account/Login">Sign in</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container-fluid app-shell">
+        <main role="main" class="page-frame">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="app-footer">
+        <div class="container-fluid app-shell">
+            &copy; 2026 CareConnect. Built for care home team acknowledgement and compliance.
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

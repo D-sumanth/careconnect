@@ -1,0 +1,40 @@
+@page
+@model CareConnect.Web.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "Sign in";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-5">
+        <section class="content-panel">
+            <p class="eyebrow mb-2">Secure access</p>
+            <h1 class="section-title mb-3">Sign in to CareConnect</h1>
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="mb-3"></div>
+                <input type="hidden" asp-for="ReturnUrl" />
+                <div class="mb-3">
+                    <label asp-for="Input.Email" class="form-label"></label>
+                    <input asp-for="Input.Email" class="form-control" autocomplete="username" />
+                    <span asp-validation-for="Input.Email"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Input.Password" class="form-label"></label>
+                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" />
+                    <span asp-validation-for="Input.Password"></span>
+                </div>
+                <div class="form-check mb-4">
+                    <input asp-for="Input.RememberMe" class="form-check-input" />
+                    <label asp-for="Input.RememberMe" class="form-check-label"></label>
+                </div>
+                <button type="submit" class="btn btn-primary touch-button w-100">Sign in</button>
+            </form>
+            <div class="alert alert-info mt-4 mb-0">
+                Development seed users: admin@careconnect.local / Admin123! and lead@careconnect.local / Lead123!
+            </div>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,51 @@
+@page
+@model CareConnect.Web.Pages.Admin.DepartmentsModel
+@{
+    ViewData["Title"] = "Departments";
+}
+
+<partial name="_AdminNav" />
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <section class="content-panel">
+            <h1 class="section-title">Add department</h1>
+            <form method="post">
+                <div asp-validation-summary="ModelOnly"></div>
+                <div class="mb-3">
+                    <label asp-for="Input.Name" class="form-label"></label>
+                    <input asp-for="Input.Name" class="form-control" />
+                    <span asp-validation-for="Input.Name"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Input.Description" class="form-label"></label>
+                    <textarea asp-for="Input.Description" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Input.Description"></span>
+                </div>
+                <button class="btn btn-primary touch-button" type="submit">Create department</button>
+            </form>
+        </section>
+    </div>
+    <div class="col-lg-7">
+        <section class="content-panel">
+            <h2 class="section-title">Departments</h2>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead><tr><th>Name</th><th>Description</th><th>Active</th></tr></thead>
+                    <tbody>
+                        @foreach (var department in Model.Departments)
+                        {
+                            <tr>
+                                <td>@department.Name</td>
+                                <td>@department.Description</td>
+                                <td>@(department.IsActive ? "Yes" : "No")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

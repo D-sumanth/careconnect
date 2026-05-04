@@ -1,0 +1,28 @@
+@page
+@model CareConnect.Web.Pages.Admin.AuditLogModel
+@{
+    ViewData["Title"] = "Audit log";
+}
+
+<partial name="_AdminNav" />
+
+<section class="content-panel">
+    <h1 class="section-title">Audit log</h1>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead><tr><th>When</th><th>Action</th><th>User</th><th>Entity</th><th>Description</th></tr></thead>
+            <tbody>
+                @foreach (var row in Model.Rows)
+                {
+                    <tr>
+                        <td>@row.OccurredAt.ToLocalTime().ToString("g")</td>
+                        <td>@row.Action</td>
+                        <td>@row.UserEmail</td>
+                        <td>@row.EntityName</td>
+                        <td>@row.Description</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>
