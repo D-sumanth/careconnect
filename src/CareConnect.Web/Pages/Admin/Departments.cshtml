@@ -22,6 +22,11 @@
                     <textarea asp-for="Input.Description" class="form-control" rows="3"></textarea>
                     <span asp-validation-for="Input.Description"></span>
                 </div>
+                <div class="mb-3">
+                    <label asp-for="Input.ExpectedStaffCount" class="form-label"></label>
+                    <input asp-for="Input.ExpectedStaffCount" class="form-control" />
+                    <span asp-validation-for="Input.ExpectedStaffCount"></span>
+                </div>
                 <button class="btn btn-primary touch-button" type="submit">Create department</button>
             </form>
         </section>
@@ -31,13 +36,14 @@
             <h2 class="section-title">Departments</h2>
             <div class="table-responsive">
                 <table class="table align-middle">
-                    <thead><tr><th>Name</th><th>Description</th><th>Active</th></tr></thead>
+                    <thead><tr><th>Name</th><th>Description</th><th>Expected staff</th><th>Active</th></tr></thead>
                     <tbody>
                         @foreach (var department in Model.Departments)
                         {
                             <tr>
                                 <td>@department.Name</td>
                                 <td>@department.Description</td>
+                                <td>@department.ExpectedStaffCount</td>
                                 <td>@(department.IsActive ? "Yes" : "No")</td>
                             </tr>
                         }

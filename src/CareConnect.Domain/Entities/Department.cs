@@ -6,6 +6,7 @@ public sealed class Department : SoftDeleteEntity
 {
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
+    public int ExpectedStaffCount { get; set; }
     public bool IsActive { get; set; } = true;
 
     public ICollection<DepartmentMembership> Memberships { get; } = new List<DepartmentMembership>();

@@ -109,6 +109,39 @@ a {
   height: 100%;
 }
 
+.session-panel {
+  background: #f8fbff;
+  border: 1px solid var(--cc-border);
+  border-radius: 12px;
+  padding: 24px;
+  font-size: 1.1rem;
+}
+
+.notice-reading-panel {
+  min-height: 480px;
+}
+
+.notice-body {
+  font-size: 1.25rem;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+.acknowledgement-session {
+  position: sticky;
+  top: 88px;
+}
+
+.session-input {
+  min-height: 56px;
+  font-size: 1.2rem;
+}
+
+.session-submit {
+  min-height: 60px;
+  font-size: 1.1rem;
+}
+
 .badge-critical {
   background: #fff1f0;
   color: var(--cc-red);

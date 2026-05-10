@@ -4,6 +4,7 @@ using CareConnect.Domain.Entities;
 using CareConnect.Domain.Enums;
 using CareConnect.Infrastructure.Identity;
 using CareConnect.Infrastructure.Persistence;
+using CareConnect.Web.Pages.Admin.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -20,7 +21,7 @@ public sealed class NoticesModel(
     [BindProperty]
     public NoticeInput Input { get; set; } = new();
 
-    public IReadOnlyList<NoticeRow> Notices { get; private set; } = [];
+    public IReadOnlyList<NoticeProgressRow> Notices { get; private set; } = [];
     public List<SelectListItem> DepartmentOptions { get; private set; } = [];
     public List<SelectListItem> TypeOptions { get; } = Enum.GetValues<InformationUpdateType>().Select(type => new SelectListItem(type.ToString(), type.ToString())).ToList();
 
@@ -62,11 +63,7 @@ public sealed class NoticesModel(
     private async Task LoadAsync(CancellationToken cancellationToken)
     {
         DepartmentOptions = await dbContext.Departments.AsNoTracking().OrderBy(department => department.Name).Select(department => new SelectListItem(department.Name, department.Id.ToString())).ToListAsync(cancellationToken);
-        Notices = await dbContext.InformationUpdates.AsNoTracking()
-            .Include(notice => notice.Departments).ThenInclude(join => join.Department)
-            .OrderByDescending(notice => notice.CreatedAt)
-            .Select(notice => new NoticeRow(notice.Title, notice.Type.ToString(), notice.Status.ToString(), string.Join(", ", notice.Departments.Select(join => join.Department!.Name))))
-            .ToListAsync(cancellationToken);
+        Notices = await NoticeProgressQueries.GetRowsAsync(dbContext, cancellationToken);
     }
 
     public sealed class NoticeInput
@@ -94,6 +91,4 @@ public sealed class NoticesModel(
         [Display(Name = "Publish immediately")]
         public bool PublishNow { get; set; } = true;
     }
-
-    public sealed record NoticeRow(string Title, string Type, string Status, string DepartmentNames);
 }

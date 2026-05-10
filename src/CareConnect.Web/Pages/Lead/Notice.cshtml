@@ -14,23 +14,37 @@
 else
 {
     <a asp-page="/Lead/Index" class="btn btn-link px-0 mb-3">Back to notices</a>
+
+    <section class="hero-panel mb-4">
+        <div class="row g-4 align-items-start">
+            <div class="col-lg-7">
+                <span class="badge @Model.Notice.BadgeClass mb-3">@Model.Notice.Type</span>
+                <h1 class="page-title mb-3">@Model.Notice.Title</h1>
+                <p class="lead-copy mb-3">@Model.Notice.Summary</p>
+                <p class="text-muted mb-0">Authorized by @Model.Notice.AuthorizedBy</p>
+            </div>
+            <div class="col-lg-5">
+                <div class="session-panel">
+                    <p class="eyebrow mb-2">Acknowledgement session</p>
+                    <div class="d-flex justify-content-between mb-2"><span>Expected</span><strong>@Model.Progress.ExpectedCount</strong></div>
+                    <div class="d-flex justify-content-between mb-2"><span>Acknowledged</span><strong>@Model.Progress.AcknowledgedCount</strong></div>
+                    <div class="d-flex justify-content-between"><span>Outstanding</span><strong>@Model.Progress.OutstandingCount</strong></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <div class="row g-4">
         <div class="col-lg-7">
-            <article class="content-panel">
-                <div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
-                    <span class="badge @Model.Notice.BadgeClass">@Model.Notice.Type</span>
-                    <span class="text-muted small">Authorized by @Model.Notice.AuthorizedBy</span>
-                </div>
-                <h1 class="section-title">@Model.Notice.Title</h1>
-                <p class="lead-copy">@Model.Notice.Summary</p>
-                <hr />
-                <div class="fs-5 lh-lg" style="white-space: pre-wrap">@Model.Notice.Body</div>
+            <article class="content-panel notice-reading-panel">
+                <h2 class="section-title">Read aloud with the team</h2>
+                <div class="notice-body">@Model.Notice.Body</div>
             </article>
         </div>
         <div class="col-lg-5">
-            <section class="content-panel">
-                <h2 class="section-title">Record acknowledgement</h2>
-                <p class="text-muted">Ask each team member to type their name after reviewing the notice.</p>
+            <section class="content-panel acknowledgement-session">
+                <h2 class="section-title">Team member acknowledgement</h2>
+                <p class="text-muted">Pass the device to each team member after they have reviewed the notice.</p>
                 @if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
                 {
                     <div class="alert alert-success">@Model.SuccessMessage</div>
@@ -39,21 +53,41 @@ else
                     <div asp-validation-summary="ModelOnly" class="mb-3"></div>
                     <div class="mb-3">
                         <label asp-for="Input.DepartmentId" class="form-label"></label>
-                        <select asp-for="Input.DepartmentId" asp-items="Model.DepartmentOptions" class="form-select"></select>
+                        <select asp-for="Input.DepartmentId" asp-items="Model.DepartmentOptions" class="form-select form-select-lg"></select>
                         <span asp-validation-for="Input.DepartmentId"></span>
                     </div>
                     <div class="mb-3">
                         <label asp-for="Input.StaffMemberName" class="form-label"></label>
-                        <input asp-for="Input.StaffMemberName" class="form-control form-control-lg" autocomplete="off" />
+                        <input asp-for="Input.StaffMemberName" class="form-control form-control-lg session-input" autocomplete="off" />
                         <span asp-validation-for="Input.StaffMemberName"></span>
                     </div>
                     <div class="mb-4">
                         <label asp-for="Input.SignatureText" class="form-label"></label>
-                        <input asp-for="Input.SignatureText" class="form-control form-control-lg" autocomplete="off" />
+                        <input asp-for="Input.SignatureText" class="form-control form-control-lg session-input" autocomplete="off" />
                         <span asp-validation-for="Input.SignatureText"></span>
                     </div>
-                    <button type="submit" class="btn btn-primary touch-button w-100">Submit acknowledgement</button>
+                    <button type="submit" class="btn btn-primary touch-button w-100 session-submit">Acknowledge notice</button>
                 </form>
+            </section>
+
+            <section class="content-panel mt-4">
+                <h2 class="section-title">This session</h2>
+                @if (Model.RecentAcknowledgements.Count == 0)
+                {
+                    <p class="text-muted mb-0">No acknowledgements recorded yet.</p>
+                }
+                else
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var ack in Model.RecentAcknowledgements)
+                        {
+                            <div class="list-group-item px-0 d-flex justify-content-between gap-3">
+                                <span>@ack.StaffMemberName</span>
+                                <span class="text-muted">@ack.AcknowledgedAt.ToLocalTime().ToString("HH:mm")</span>
+                            </div>
+                        }
+                    </div>
+                }
             </section>
         </div>
     </div>

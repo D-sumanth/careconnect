@@ -22,6 +22,8 @@ public sealed class NoticeModel(
     public NoticeDetails? Notice { get; private set; }
     public List<SelectListItem> DepartmentOptions { get; private set; } = [];
     public string? SuccessMessage { get; private set; }
+    public SessionProgress Progress { get; private set; } = new(0, 0, 0);
+    public IReadOnlyList<RecentAcknowledgement> RecentAcknowledgements { get; private set; } = [];
 
     public async Task<IActionResult> OnGetAsync(Guid id, CancellationToken cancellationToken)
     {
@@ -95,6 +97,7 @@ public sealed class NoticeModel(
             .AsNoTracking()
             .Include(item => item.Departments)
             .ThenInclude(join => join.Department)
+            .Include(item => item.Acknowledgements)
             .FirstOrDefaultAsync(item =>
                 item.Id == id &&
                 item.Status == InformationUpdateStatus.Published &&
@@ -115,6 +118,19 @@ public sealed class NoticeModel(
             update.Type.ToString(),
             update.Type == InformationUpdateType.Critical ? "badge-critical" :
                 update.Type == InformationUpdateType.EventBased ? "badge-event" : "badge-routine");
+
+        var expected = update.Departments
+            .Where(join => departmentIds.Contains(join.DepartmentId))
+            .Sum(join => join.Department?.ExpectedStaffCount ?? 0);
+        var acknowledged = update.Acknowledgements.Count(ack => departmentIds.Contains(ack.DepartmentId));
+        Progress = new SessionProgress(expected, acknowledged, Math.Max(expected - acknowledged, 0));
+
+        RecentAcknowledgements = update.Acknowledgements
+            .Where(ack => departmentIds.Contains(ack.DepartmentId))
+            .OrderByDescending(ack => ack.AcknowledgedAt)
+            .Take(10)
+            .Select(ack => new RecentAcknowledgement(ack.StaffMemberName, ack.AcknowledgedAt))
+            .ToList();
 
         if (Input.DepartmentId == Guid.Empty && DepartmentOptions.Count > 0)
         {
@@ -145,4 +161,7 @@ public sealed class NoticeModel(
         string AuthorizedBy,
         string Type,
         string BadgeClass);
+
+    public sealed record SessionProgress(int ExpectedCount, int AcknowledgedCount, int OutstandingCount);
+    public sealed record RecentAcknowledgement(string StaffMemberName, DateTimeOffset AcknowledgedAt);
 }

@@ -24,25 +24,7 @@
         </section>
     </div>
     <div class="col-lg-7">
-        <section class="content-panel">
-            <h2 class="section-title">Notices</h2>
-            <div class="table-responsive">
-                <table class="table align-middle">
-                    <thead><tr><th>Title</th><th>Type</th><th>Status</th><th>Departments</th></tr></thead>
-                    <tbody>
-                        @foreach (var notice in Model.Notices)
-                        {
-                            <tr>
-                                <td>@notice.Title</td>
-                                <td>@notice.Type</td>
-                                <td>@notice.Status</td>
-                                <td>@notice.DepartmentNames</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </section>
+        <partial name="_NoticeProgressTable" model="Model.Notices" />
     </div>
 </div>
 

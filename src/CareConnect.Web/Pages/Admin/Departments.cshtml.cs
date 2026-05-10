@@ -36,6 +36,7 @@ public sealed class DepartmentsModel(
         {
             Name = Input.Name.Trim(),
             Description = Input.Description?.Trim(),
+            ExpectedStaffCount = Input.ExpectedStaffCount,
             CreatedByUserId = user?.Id
         };
 
@@ -58,5 +59,9 @@ public sealed class DepartmentsModel(
 
         [StringLength(500)]
         public string? Description { get; set; }
+
+        [Display(Name = "Expected staff count")]
+        [Range(0, 500)]
+        public int ExpectedStaffCount { get; set; }
     }
 }

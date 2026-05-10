@@ -31,6 +31,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
         {
             entity.Property(department => department.Name).HasMaxLength(140).IsRequired();
             entity.Property(department => department.Description).HasMaxLength(500);
+            entity.Property(department => department.ExpectedStaffCount).HasDefaultValue(0);
             entity.HasIndex(department => department.Name).IsUnique();
             entity.HasQueryFilter(department => !department.IsDeleted);
         });

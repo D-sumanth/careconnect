@@ -43,6 +43,7 @@ public sealed class SeedDataService(
             {
                 Name = "Catering",
                 Description = "Kitchen and catering team",
+                ExpectedStaffCount = 8,
                 CreatedAt = dateTimeProvider.UtcNow,
                 CreatedByUserId = admin.Id
             };
@@ -50,6 +51,7 @@ public sealed class SeedDataService(
             {
                 Name = "Housekeeping",
                 Description = "Housekeeping and domestic team",
+                ExpectedStaffCount = 6,
                 CreatedAt = dateTimeProvider.UtcNow,
                 CreatedByUserId = admin.Id
             };
