@@ -4,14 +4,14 @@
     ViewData["Title"] = "Lead dashboard";
 }
 
-<section class="content-panel mb-4">
+<section class="hero-panel mb-4">
     <p class="eyebrow mb-2">Department lead</p>
     <div class="d-flex flex-wrap justify-content-between gap-3 align-items-start">
         <div>
             <h1 class="section-title mb-2">Assigned notices</h1>
             <p class="lead-copy mb-0">Open each notice with your team and capture typed acknowledgements on this device.</p>
         </div>
-        <span class="badge text-bg-light border">@Model.Notices.Count notices</span>
+        <span class="status-pill">@Model.Notices.Count notices</span>
     </div>
 </section>
 
@@ -28,7 +28,7 @@ else
         @foreach (var notice in Model.Notices)
         {
             <div class="col-md-6 col-xl-4">
-                <article class="notice-card">
+                <article class="notice-card lead-notice-card">
                     <div class="d-flex justify-content-between gap-2 mb-3">
                         <span class="badge @notice.BadgeClass">@notice.Type</span>
                         <span class="text-muted small">@notice.PublishedAt?.ToLocalTime().ToString("dd MMM yyyy")</span>

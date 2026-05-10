@@ -1,7 +1,12 @@
+@{
+    var path = Context.Request.Path.Value ?? string.Empty;
+    string Active(string page) => path.StartsWith(page, StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty;
+}
+
 <nav class="admin-nav" aria-label="Admin navigation">
-    <a asp-page="/Admin/Notices">Notices</a>
-    <a asp-page="/Admin/Acknowledgements">Acknowledgements</a>
-    <a asp-page="/Admin/Departments">Departments</a>
-    <a asp-page="/Admin/Users">Users</a>
-    <a asp-page="/Admin/AuditLog">Audit log</a>
+    <a class="@Active("/Admin/Notice")" asp-page="/Admin/Notices">Notices</a>
+    <a class="@Active("/Admin/Acknowledgements")" asp-page="/Admin/Acknowledgements">Acknowledgements</a>
+    <a class="@Active("/Admin/Departments")" asp-page="/Admin/Departments">Departments</a>
+    <a class="@Active("/Admin/Users")" asp-page="/Admin/Users">Users</a>
+    <a class="@Active("/Admin/AuditLog")" asp-page="/Admin/AuditLog">Audit log</a>
 </nav>

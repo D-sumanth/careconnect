@@ -1,49 +1,59 @@
 @model IReadOnlyList<CareConnect.Web.Pages.Admin.Models.NoticeProgressRow>
 
-<section class="content-panel">
+<section class="content-panel table-panel">
     <div class="d-flex flex-wrap justify-content-between gap-2 align-items-center mb-3">
         <h2 class="section-title mb-0">Notices</h2>
         <span class="text-muted small">@Model.Count total</span>
     </div>
-    <div class="table-responsive">
-        <table class="table align-middle">
-            <thead>
-                <tr>
-                    <th>Notice</th>
-                    <th>Type</th>
-                    <th>Status</th>
-                    <th>Departments</th>
-                    <th>Progress</th>
-                    <th>Outstanding</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var notice in Model)
-                {
-                    var percent = notice.ExpectedCount == 0 ? 0 : Math.Min(100, (int)Math.Round((double)notice.AcknowledgedCount / notice.ExpectedCount * 100));
+    @if (Model.Count == 0)
+    {
+        <div class="empty-state">
+            <h3>No notices yet</h3>
+            <p>Create the first notice to start collecting team acknowledgements.</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
                     <tr>
-                        <td>
-                            <strong>@notice.Title</strong>
-                            <div class="text-muted small">@(notice.PublishedAt?.ToLocalTime().ToString("dd MMM yyyy") ?? "Not published")</div>
-                        </td>
-                        <td>@notice.Type</td>
-                        <td>@notice.Status</td>
-                        <td>@notice.DepartmentNames</td>
-                        <td style="min-width: 180px">
-                            <div class="d-flex justify-content-between small mb-1">
-                                <span>@notice.AcknowledgedCount / @notice.ExpectedCount</span>
-                                <span>@percent%</span>
-                            </div>
-                            <div class="progress" role="progressbar" aria-label="Acknowledgement progress" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100">
-                                <div class="progress-bar" style="width: @percent%"></div>
-                            </div>
-                        </td>
-                        <td>@notice.OutstandingCount</td>
-                        <td><a class="btn btn-outline-primary btn-sm" asp-page="/Admin/Notice" asp-route-id="@notice.Id">Open</a></td>
+                        <th>Notice</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Departments</th>
+                        <th>Progress</th>
+                        <th>Outstanding</th>
+                        <th></th>
                     </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+                </thead>
+                <tbody>
+                    @foreach (var notice in Model)
+                    {
+                        var percent = notice.ExpectedCount == 0 ? 0 : Math.Min(100, (int)Math.Round((double)notice.AcknowledgedCount / notice.ExpectedCount * 100));
+                        <tr>
+                            <td>
+                                <strong>@notice.Title</strong>
+                                <div class="text-muted small">@(notice.PublishedAt?.ToLocalTime().ToString("dd MMM yyyy") ?? "Not published")</div>
+                            </td>
+                            <td><span class="status-pill">@notice.Type</span></td>
+                            <td><span class="status-pill status-pill-muted">@notice.Status</span></td>
+                            <td>@notice.DepartmentNames</td>
+                            <td style="min-width: 180px">
+                                <div class="d-flex justify-content-between small mb-1">
+                                    <span>@notice.AcknowledgedCount / @notice.ExpectedCount</span>
+                                    <span>@percent%</span>
+                                </div>
+                                <div class="progress" role="progressbar" aria-label="Acknowledgement progress" aria-valuenow="@percent" aria-valuemin="0" aria-valuemax="100">
+                                    <div class="progress-bar" style="width: @percent%"></div>
+                                </div>
+                            </td>
+                            <td><strong>@notice.OutstandingCount</strong></td>
+                            <td><a class="btn btn-outline-primary btn-sm" asp-page="/Admin/Notice" asp-route-id="@notice.Id">Open</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 </section>

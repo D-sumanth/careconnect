@@ -26,9 +26,9 @@ else
             <div class="col-lg-5">
                 <div class="session-panel">
                     <p class="eyebrow mb-2">Acknowledgement session</p>
-                    <div class="d-flex justify-content-between mb-2"><span>Expected</span><strong>@Model.Progress.ExpectedCount</strong></div>
-                    <div class="d-flex justify-content-between mb-2"><span>Acknowledged</span><strong>@Model.Progress.AcknowledgedCount</strong></div>
-                    <div class="d-flex justify-content-between"><span>Outstanding</span><strong>@Model.Progress.OutstandingCount</strong></div>
+                    <div class="session-metric"><span>Expected</span><strong>@Model.Progress.ExpectedCount</strong></div>
+                    <div class="session-metric"><span>Acknowledged</span><strong>@Model.Progress.AcknowledgedCount</strong></div>
+                    <div class="session-metric mb-0"><span>Outstanding</span><strong>@Model.Progress.OutstandingCount</strong></div>
                 </div>
             </div>
         </div>
@@ -44,7 +44,7 @@ else
         <div class="col-lg-5">
             <section class="content-panel acknowledgement-session">
                 <h2 class="section-title">Team member acknowledgement</h2>
-                <p class="text-muted">Pass the device to each team member after they have reviewed the notice.</p>
+                <p class="text-muted">Ask each team member to type their name after they have reviewed the notice.</p>
                 @if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
                 {
                     <div class="alert alert-success">@Model.SuccessMessage</div>

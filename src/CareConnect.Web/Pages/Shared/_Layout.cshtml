@@ -12,7 +12,10 @@
     <header class="app-header">
         <nav class="navbar navbar-expand-lg navbar-light">
             <div class="container-fluid app-shell">
-                <a class="navbar-brand brand" asp-page="/Index">CareConnect</a>
+                <a class="navbar-brand brand" asp-page="/Index">
+                    <span class="brand-mark" aria-hidden="true">C</span>
+                    <span>CareConnect</span>
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -38,7 +41,7 @@
                     <ul class="navbar-nav align-items-lg-center gap-lg-2">
                         @if (User.Identity?.IsAuthenticated == true)
                         {
-                            <li class="nav-item text-muted small px-lg-2">@User.Identity.Name</li>
+                            <li class="nav-item signed-in-user px-lg-2">@User.Identity.Name</li>
                             <li class="nav-item">
                                 <form method="post" asp-page="/Account/Logout">
                                     <button class="btn btn-link nav-link" type="submit">Sign out</button>
@@ -56,7 +59,7 @@
             </div>
         </nav>
     </header>
-    <div class="container-fluid app-shell">
+    <div class="container-fluid app-shell app-main">
         <main role="main" class="page-frame">
             @RenderBody()
         </main>
