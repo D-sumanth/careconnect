@@ -10,6 +10,7 @@ namespace CareConnect.Infrastructure.Services;
 public sealed class AcknowledgementService(
     AppDbContext dbContext,
     IDateTimeProvider dateTimeProvider,
+    INameNormalizer nameNormalizer,
     IAuditLogService auditLogService) : IAcknowledgementService
 {
     public async Task<AcknowledgementResult> CreateAsync(
@@ -17,6 +18,7 @@ public sealed class AcknowledgementService(
         CancellationToken cancellationToken = default)
     {
         var staffName = request.StaffMemberName.Trim();
+        var normalizedStaffName = nameNormalizer.Normalize(staffName);
         if (staffName.Length < 2)
         {
             throw new InvalidOperationException("Staff member name is required.");
@@ -51,13 +53,33 @@ public sealed class AcknowledgementService(
             throw new InvalidOperationException("The signed-in lead is not assigned to this department.");
         }
 
+        var existingAcknowledgement = await dbContext.Acknowledgements.AnyAsync(ack =>
+            ack.InformationUpdateId == request.InformationUpdateId &&
+            ack.DepartmentId == request.DepartmentId &&
+            ack.NormalizedStaffMemberName == normalizedStaffName &&
+            !ack.IsVoided,
+            cancellationToken);
+
+        if (existingAcknowledgement)
+        {
+            throw new InvalidOperationException("This team member has already acknowledged this notice for the selected department.");
+        }
+
+        var staffMember = await dbContext.StaffMembers.FirstOrDefaultAsync(staff =>
+            staff.DepartmentId == request.DepartmentId &&
+            staff.NormalizedName == normalizedStaffName &&
+            staff.IsActive,
+            cancellationToken);
+
         var now = dateTimeProvider.UtcNow;
         var acknowledgement = new Acknowledgement
         {
             InformationUpdateId = request.InformationUpdateId,
             DepartmentId = request.DepartmentId,
             LeadUserId = request.LeadUserId,
+            StaffMemberId = staffMember?.Id,
             StaffMemberName = staffName,
+            NormalizedStaffMemberName = normalizedStaffName,
             SignatureText = string.IsNullOrWhiteSpace(request.SignatureText) ? staffName : request.SignatureText.Trim(),
             AcknowledgedAt = now,
             CreatedAt = now,

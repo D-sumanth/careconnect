@@ -24,6 +24,8 @@ public sealed class NoticeModel(
     public string? SuccessMessage { get; private set; }
     public SessionProgress Progress { get; private set; } = new(0, 0, 0);
     public IReadOnlyList<RecentAcknowledgement> RecentAcknowledgements { get; private set; } = [];
+    public IReadOnlyList<string> StaffSuggestions { get; private set; } = [];
+    public IReadOnlyList<MissingStaffRow> MissingStaff { get; private set; } = [];
 
     public async Task<IActionResult> OnGetAsync(Guid id, CancellationToken cancellationToken)
     {
@@ -97,6 +99,7 @@ public sealed class NoticeModel(
             .AsNoTracking()
             .Include(item => item.Departments)
             .ThenInclude(join => join.Department)
+            .ThenInclude(department => department!.StaffMembers)
             .Include(item => item.Acknowledgements)
             .FirstOrDefaultAsync(item =>
                 item.Id == id &&
@@ -119,14 +122,40 @@ public sealed class NoticeModel(
             update.Type == InformationUpdateType.Critical ? "badge-critical" :
                 update.Type == InformationUpdateType.EventBased ? "badge-event" : "badge-routine");
 
+        StaffSuggestions = update.Departments
+            .Where(join => departmentIds.Contains(join.DepartmentId))
+            .SelectMany(join => join.Department?.StaffMembers.Where(staff => staff.IsActive).Select(staff => staff.FullName) ?? [])
+            .Distinct()
+            .Order()
+            .ToList();
+
         var expected = update.Departments
             .Where(join => departmentIds.Contains(join.DepartmentId))
-            .Sum(join => join.Department?.ExpectedStaffCount ?? 0);
-        var acknowledged = update.Acknowledgements.Count(ack => departmentIds.Contains(ack.DepartmentId));
+            .Sum(join =>
+            {
+                var directoryCount = join.Department?.StaffMembers.Count(staff => staff.IsActive) ?? 0;
+                return directoryCount > 0 ? directoryCount : join.Department?.ExpectedStaffCount ?? 0;
+            });
+        var acknowledged = update.Acknowledgements.Count(ack => departmentIds.Contains(ack.DepartmentId) && !ack.IsVoided);
         Progress = new SessionProgress(expected, acknowledged, Math.Max(expected - acknowledged, 0));
 
+        var acknowledgedKeys = update.Acknowledgements
+            .Where(ack => departmentIds.Contains(ack.DepartmentId) && !ack.IsVoided)
+            .Select(ack => $"{ack.DepartmentId:N}:{ack.NormalizedStaffMemberName}")
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        MissingStaff = update.Departments
+            .Where(join => departmentIds.Contains(join.DepartmentId))
+            .SelectMany(join => join.Department?.StaffMembers
+                .Where(staff => staff.IsActive)
+                .Where(staff => !acknowledgedKeys.Contains($"{staff.DepartmentId:N}:{staff.NormalizedName}"))
+                .Select(staff => new MissingStaffRow(staff.FullName, join.Department?.Name ?? "Unknown")) ?? [])
+            .OrderBy(row => row.DepartmentName)
+            .ThenBy(row => row.FullName)
+            .ToList();
+
         RecentAcknowledgements = update.Acknowledgements
-            .Where(ack => departmentIds.Contains(ack.DepartmentId))
+            .Where(ack => departmentIds.Contains(ack.DepartmentId) && !ack.IsVoided)
             .OrderByDescending(ack => ack.AcknowledgedAt)
             .Take(10)
             .Select(ack => new RecentAcknowledgement(ack.StaffMemberName, ack.AcknowledgedAt))
@@ -164,4 +193,5 @@ public sealed class NoticeModel(
 
     public sealed record SessionProgress(int ExpectedCount, int AcknowledgedCount, int OutstandingCount);
     public sealed record RecentAcknowledgement(string StaffMemberName, DateTimeOffset AcknowledgedAt);
+    public sealed record MissingStaffRow(string FullName, string DepartmentName);
 }

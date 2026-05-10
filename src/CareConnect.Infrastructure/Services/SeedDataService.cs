@@ -13,7 +13,8 @@ public sealed class SeedDataService(
     AppDbContext dbContext,
     UserManager<ApplicationUser> userManager,
     RoleManager<IdentityRole<Guid>> roleManager,
-    IDateTimeProvider dateTimeProvider) : ISeedDataService
+    IDateTimeProvider dateTimeProvider,
+    INameNormalizer nameNormalizer) : ISeedDataService
 {
     public async Task SeedDevelopmentAsync(CancellationToken cancellationToken = default)
     {
@@ -57,6 +58,13 @@ public sealed class SeedDataService(
             };
 
             dbContext.Departments.AddRange(catering, housekeeping);
+            dbContext.StaffMembers.AddRange(
+                CreateStaff(catering, "Amelia Brown", "CAT-001", admin.Id),
+                CreateStaff(catering, "Noah Patel", "CAT-002", admin.Id),
+                CreateStaff(catering, "Grace Wilson", "CAT-003", admin.Id),
+                CreateStaff(catering, "Oliver Hughes", "CAT-004", admin.Id),
+                CreateStaff(housekeeping, "Mia Taylor", "HSK-001", admin.Id),
+                CreateStaff(housekeeping, "James Walker", "HSK-002", admin.Id));
             dbContext.DepartmentMemberships.Add(new DepartmentMembership
             {
                 Department = catering,
@@ -83,6 +91,19 @@ public sealed class SeedDataService(
             dbContext.InformationUpdates.Add(update);
             await dbContext.SaveChangesAsync(cancellationToken);
         }
+    }
+
+    private StaffMember CreateStaff(Department department, string fullName, string employeeReference, Guid adminId)
+    {
+        return new StaffMember
+        {
+            Department = department,
+            FullName = fullName,
+            NormalizedName = nameNormalizer.Normalize(fullName),
+            EmployeeReference = employeeReference,
+            CreatedAt = dateTimeProvider.UtcNow,
+            CreatedByUserId = adminId
+        };
     }
 
     private async Task<ApplicationUser> EnsureUserAsync(

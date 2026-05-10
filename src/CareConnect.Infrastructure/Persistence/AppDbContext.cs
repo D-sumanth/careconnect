@@ -11,6 +11,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
     : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>(options)
 {
     public DbSet<Department> Departments => Set<Department>();
+    public DbSet<StaffMember> StaffMembers => Set<StaffMember>();
     public DbSet<DepartmentMembership> DepartmentMemberships => Set<DepartmentMembership>();
     public DbSet<InformationUpdate> InformationUpdates => Set<InformationUpdate>();
     public DbSet<InformationUpdateDepartment> InformationUpdateDepartments => Set<InformationUpdateDepartment>();
@@ -34,6 +35,21 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
             entity.Property(department => department.ExpectedStaffCount).HasDefaultValue(0);
             entity.HasIndex(department => department.Name).IsUnique();
             entity.HasQueryFilter(department => !department.IsDeleted);
+        });
+
+        builder.Entity<StaffMember>(entity =>
+        {
+            entity.Property(staff => staff.FullName).HasMaxLength(160).IsRequired();
+            entity.Property(staff => staff.NormalizedName).HasMaxLength(160).IsRequired();
+            entity.Property(staff => staff.EmployeeReference).HasMaxLength(80);
+            entity.HasIndex(staff => new { staff.DepartmentId, staff.NormalizedName })
+                .IsUnique()
+                .HasFilter("\"IsDeleted\" = false");
+            entity.HasQueryFilter(staff => !staff.IsDeleted);
+            entity.HasOne(staff => staff.Department)
+                .WithMany(department => department.StaffMembers)
+                .HasForeignKey(staff => staff.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         builder.Entity<DepartmentMembership>(entity =>
@@ -73,10 +89,13 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
         builder.Entity<Acknowledgement>(entity =>
         {
             entity.Property(ack => ack.StaffMemberName).HasMaxLength(160).IsRequired();
+            entity.Property(ack => ack.NormalizedStaffMemberName).HasMaxLength(160).IsRequired();
             entity.Property(ack => ack.SignatureText).HasMaxLength(160).IsRequired();
+            entity.Property(ack => ack.VoidReason).HasMaxLength(500);
+            entity.Property(ack => ack.CorrectionNote).HasMaxLength(500);
             entity.Property(ack => ack.IpAddressHash).HasMaxLength(128);
             entity.Property(ack => ack.UserAgent).HasMaxLength(500);
-            entity.HasIndex(ack => new { ack.InformationUpdateId, ack.DepartmentId, ack.StaffMemberName });
+            entity.HasIndex(ack => new { ack.InformationUpdateId, ack.DepartmentId, ack.NormalizedStaffMemberName });
             entity.HasOne(ack => ack.InformationUpdate)
                 .WithMany(update => update.Acknowledgements)
                 .HasForeignKey(ack => ack.InformationUpdateId)
@@ -85,6 +104,10 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
                 .WithMany(department => department.Acknowledgements)
                 .HasForeignKey(ack => ack.DepartmentId)
                 .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(ack => ack.StaffMember)
+                .WithMany(staff => staff.Acknowledgements)
+                .HasForeignKey(ack => ack.StaffMemberId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
 
         builder.Entity<AuditLog>(entity =>

@@ -58,7 +58,13 @@ else
                     </div>
                     <div class="mb-3">
                         <label asp-for="Input.StaffMemberName" class="form-label"></label>
-                        <input asp-for="Input.StaffMemberName" class="form-control form-control-lg session-input" autocomplete="off" />
+                        <input asp-for="Input.StaffMemberName" class="form-control form-control-lg session-input" list="staff-directory" autocomplete="off" />
+                        <datalist id="staff-directory">
+                            @foreach (var staff in Model.StaffSuggestions)
+                            {
+                                <option value="@staff"></option>
+                            }
+                        </datalist>
                         <span asp-validation-for="Input.StaffMemberName"></span>
                     </div>
                     <div class="mb-4">
@@ -84,6 +90,25 @@ else
                             <div class="list-group-item px-0 d-flex justify-content-between gap-3">
                                 <span>@ack.StaffMemberName</span>
                                 <span class="text-muted">@ack.AcknowledgedAt.ToLocalTime().ToString("HH:mm")</span>
+                            </div>
+                        }
+                    </div>
+                }
+            </section>
+            <section class="content-panel mt-4">
+                <h2 class="section-title">Still missing</h2>
+                @if (Model.MissingStaff.Count == 0)
+                {
+                    <p class="text-muted mb-0">All named staff in the assigned departments have acknowledged this notice.</p>
+                }
+                else
+                {
+                    <div class="missing-staff-list">
+                        @foreach (var staff in Model.MissingStaff.Take(12))
+                        {
+                            <div class="missing-staff-chip">
+                                <strong>@staff.FullName</strong>
+                                <span>@staff.DepartmentName</span>
                             </div>
                         }
                     </div>

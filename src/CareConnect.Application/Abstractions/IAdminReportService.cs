@@ -10,4 +10,7 @@ public sealed record AcknowledgementExportFilter(
     Guid? InformationUpdateId,
     Guid? LeadUserId,
     DateOnly? From,
-    DateOnly? To);
+    DateOnly? To,
+    Guid? RequestedByUserId = null,
+    string? RequestedByEmail = null,
+    string? RequestIpAddress = null);

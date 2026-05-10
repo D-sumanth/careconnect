@@ -24,6 +24,7 @@ public static class NoticeProgressQueries
             .AsNoTracking()
             .Include(notice => notice.Departments)
             .ThenInclude(join => join.Department)
+            .ThenInclude(department => department!.StaffMembers)
             .Include(notice => notice.Acknowledgements)
             .OrderByDescending(notice => notice.Status)
             .ThenByDescending(notice => notice.PublishedAt ?? notice.CreatedAt)
@@ -32,8 +33,12 @@ public static class NoticeProgressQueries
         return notices
             .Select(notice =>
             {
-                var expected = notice.Departments.Sum(join => join.Department?.ExpectedStaffCount ?? 0);
-                var acknowledged = notice.Acknowledgements.Count;
+                var expected = notice.Departments.Sum(join =>
+                {
+                    var directoryCount = join.Department?.StaffMembers.Count(staff => staff.IsActive) ?? 0;
+                    return directoryCount > 0 ? directoryCount : join.Department?.ExpectedStaffCount ?? 0;
+                });
+                var acknowledged = notice.Acknowledgements.Count(ack => !ack.IsVoided);
                 return new NoticeProgressRow(
                     notice.Id,
                     notice.Title,

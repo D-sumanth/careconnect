@@ -1,0 +1,72 @@
+@page
+@model CareConnect.Web.Pages.Admin.StaffModel
+@{
+    ViewData["Title"] = "Staff directory";
+}
+
+<partial name="_AdminNav" />
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <section class="content-panel">
+            <p class="eyebrow mb-2">Directory</p>
+            <h1 class="section-title">Add staff member</h1>
+            <form method="post">
+                <div asp-validation-summary="ModelOnly"></div>
+                <div class="mb-3">
+                    <label asp-for="Input.DepartmentId" class="form-label"></label>
+                    <select asp-for="Input.DepartmentId" asp-items="Model.DepartmentOptions" class="form-select"></select>
+                    <span asp-validation-for="Input.DepartmentId"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Input.FullName" class="form-label"></label>
+                    <input asp-for="Input.FullName" class="form-control" autocomplete="off" />
+                    <span asp-validation-for="Input.FullName"></span>
+                </div>
+                <div class="mb-4">
+                    <label asp-for="Input.EmployeeReference" class="form-label"></label>
+                    <input asp-for="Input.EmployeeReference" class="form-control" autocomplete="off" />
+                    <span asp-validation-for="Input.EmployeeReference"></span>
+                </div>
+                <button class="btn btn-primary touch-button w-100" type="submit">Add staff member</button>
+            </form>
+        </section>
+    </div>
+    <div class="col-lg-8">
+        <section class="content-panel table-panel">
+            <div class="d-flex flex-wrap justify-content-between gap-2 align-items-center mb-3">
+                <div>
+                    <p class="eyebrow mb-2">Compliance baseline</p>
+                    <h2 class="section-title mb-0">Staff directory</h2>
+                </div>
+                <span class="status-pill">@Model.Staff.Count records</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead><tr><th>Name</th><th>Department</th><th>Reference</th><th>Status</th><th></th></tr></thead>
+                    <tbody>
+                        @foreach (var staff in Model.Staff)
+                        {
+                            <tr>
+                                <td><strong>@staff.FullName</strong></td>
+                                <td>@staff.DepartmentName</td>
+                                <td>@(staff.EmployeeReference ?? "-")</td>
+                                <td><span class="status-pill @(staff.IsActive ? string.Empty : "status-pill-muted")">@(staff.IsActive ? "Active" : "Inactive")</span></td>
+                                <td>
+                                    @if (staff.IsActive)
+                                    {
+                                        <form method="post" asp-page-handler="Deactivate" asp-route-id="@staff.Id">
+                                            <button class="btn btn-outline-danger btn-sm" type="submit">Deactivate</button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

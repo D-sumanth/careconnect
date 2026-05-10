@@ -1,5 +1,7 @@
 using CareConnect.Application.Abstractions;
+using CareConnect.Infrastructure.Identity;
 using CareConnect.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -9,6 +11,7 @@ namespace CareConnect.Web.Pages.Admin;
 
 public sealed class AcknowledgementsModel(
     AppDbContext dbContext,
+    UserManager<ApplicationUser> userManager,
     IAdminReportService adminReportService) : PageModel
 {
     [BindProperty(SupportsGet = true)]
@@ -35,7 +38,8 @@ public sealed class AcknowledgementsModel(
 
     public async Task<IActionResult> OnPostExportAsync(CancellationToken cancellationToken)
     {
-        var csv = await adminReportService.ExportAcknowledgementsCsvAsync(new AcknowledgementExportFilter(DepartmentId, InformationUpdateId, null, From, To), cancellationToken);
+        var admin = await userManager.GetUserAsync(User);
+        var csv = await adminReportService.ExportAcknowledgementsCsvAsync(new AcknowledgementExportFilter(DepartmentId, InformationUpdateId, null, From, To, admin?.Id, admin?.Email, HttpContext.Connection.RemoteIpAddress?.ToString()), cancellationToken);
         return File(System.Text.Encoding.UTF8.GetBytes(csv), "text/csv", $"acknowledgements-{DateTimeOffset.UtcNow:yyyyMMddHHmm}.csv");
     }
 
@@ -76,9 +80,10 @@ public sealed class AcknowledgementsModel(
                 ack.StaffMemberName,
                 ack.SignatureText,
                 ack.LeadUserId,
-                ack.AcknowledgedAt))
+                ack.AcknowledgedAt,
+                ack.IsVoided))
             .ToListAsync(cancellationToken);
     }
 
-    public sealed record AcknowledgementRow(string NoticeTitle, string DepartmentName, string StaffMemberName, string SignatureText, Guid LeadUserId, DateTimeOffset AcknowledgedAt);
+    public sealed record AcknowledgementRow(string NoticeTitle, string DepartmentName, string StaffMemberName, string SignatureText, Guid LeadUserId, DateTimeOffset AcknowledgedAt, bool IsVoided);
 }

@@ -16,6 +16,7 @@ public sealed class NoticeModel(
     AppDbContext dbContext,
     UserManager<ApplicationUser> userManager,
     IAuditLogService auditLogService,
+    INameNormalizer nameNormalizer,
     IAdminReportService adminReportService) : PageModel
 {
     [BindProperty]
@@ -24,6 +25,7 @@ public sealed class NoticeModel(
     public NoticeDetails? Notice { get; private set; }
     public NoticeProgress Progress { get; private set; } = new(0, 0, 0);
     public IReadOnlyList<DepartmentProgressRow> DepartmentProgress { get; private set; } = [];
+    public IReadOnlyList<MissingStaffRow> MissingStaff { get; private set; } = [];
     public IReadOnlyList<AcknowledgementRow> Acknowledgements { get; private set; } = [];
     public List<SelectListItem> DepartmentOptions { get; private set; } = [];
     public List<SelectListItem> TypeOptions { get; } = Enum.GetValues<InformationUpdateType>().Select(type => new SelectListItem(type.ToString(), type.ToString())).ToList();
@@ -57,6 +59,8 @@ public sealed class NoticeModel(
         notice.Body = Input.Body.Trim();
         notice.AuthorizedBy = Input.AuthorizedBy.Trim();
         notice.Type = Input.Type;
+        notice.ReviewBy = Input.ReviewBy;
+        notice.ExpiresOn = Input.ExpiresOn;
         notice.UpdatedAt = DateTimeOffset.UtcNow;
         notice.UpdatedByUserId = admin?.Id;
 
@@ -83,8 +87,59 @@ public sealed class NoticeModel(
 
     public async Task<IActionResult> OnPostExportAsync(Guid id, CancellationToken cancellationToken)
     {
-        var csv = await adminReportService.ExportAcknowledgementsCsvAsync(new AcknowledgementExportFilter(null, id, null, null, null), cancellationToken);
+        var admin = await userManager.GetUserAsync(User);
+        var csv = await adminReportService.ExportAcknowledgementsCsvAsync(new AcknowledgementExportFilter(null, id, null, null, null, admin?.Id, admin?.Email, HttpContext.Connection.RemoteIpAddress?.ToString()), cancellationToken);
         return File(System.Text.Encoding.UTF8.GetBytes(csv), "text/csv", $"notice-{id}-acknowledgements.csv");
+    }
+
+    public async Task<IActionResult> OnPostVoidAcknowledgementAsync(Guid id, Guid acknowledgementId, string? reason, CancellationToken cancellationToken)
+    {
+        var admin = await userManager.GetUserAsync(User);
+        var acknowledgement = await dbContext.Acknowledgements.FirstOrDefaultAsync(ack => ack.Id == acknowledgementId && ack.InformationUpdateId == id, cancellationToken);
+        if (acknowledgement is null)
+        {
+            return NotFound();
+        }
+
+        acknowledgement.IsVoided = true;
+        acknowledgement.VoidReason = string.IsNullOrWhiteSpace(reason) ? "Voided by admin." : reason.Trim();
+        acknowledgement.VoidedAt = DateTimeOffset.UtcNow;
+        acknowledgement.VoidedByUserId = admin?.Id;
+        acknowledgement.UpdatedAt = DateTimeOffset.UtcNow;
+        acknowledgement.UpdatedByUserId = admin?.Id;
+        await dbContext.SaveChangesAsync(cancellationToken);
+        await auditLogService.RecordAsync(new AuditLogEntry(admin?.Id, admin?.Email, AuditAction.AcknowledgementVoided, nameof(Acknowledgement), acknowledgement.Id.ToString(), $"Acknowledgement for '{acknowledgement.StaffMemberName}' voided. Reason: {acknowledgement.VoidReason}", HttpContext.Connection.RemoteIpAddress?.ToString()), cancellationToken);
+
+        return RedirectToPage(new { id });
+    }
+
+    public async Task<IActionResult> OnPostCorrectAcknowledgementAsync(Guid id, Guid acknowledgementId, string staffMemberName, string? note, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(staffMemberName))
+        {
+            await LoadAsync(id, cancellationToken);
+            ModelState.AddModelError(string.Empty, "Corrected staff member name is required.");
+            return Page();
+        }
+
+        var admin = await userManager.GetUserAsync(User);
+        var acknowledgement = await dbContext.Acknowledgements.FirstOrDefaultAsync(ack => ack.Id == acknowledgementId && ack.InformationUpdateId == id, cancellationToken);
+        if (acknowledgement is null)
+        {
+            return NotFound();
+        }
+
+        var originalName = acknowledgement.StaffMemberName;
+        acknowledgement.StaffMemberName = staffMemberName.Trim();
+        acknowledgement.NormalizedStaffMemberName = nameNormalizer.Normalize(staffMemberName);
+        acknowledgement.SignatureText = staffMemberName.Trim();
+        acknowledgement.CorrectionNote = string.IsNullOrWhiteSpace(note) ? $"Corrected from '{originalName}'." : note.Trim();
+        acknowledgement.UpdatedAt = DateTimeOffset.UtcNow;
+        acknowledgement.UpdatedByUserId = admin?.Id;
+        await dbContext.SaveChangesAsync(cancellationToken);
+        await auditLogService.RecordAsync(new AuditLogEntry(admin?.Id, admin?.Email, AuditAction.AcknowledgementCorrected, nameof(Acknowledgement), acknowledgement.Id.ToString(), $"Acknowledgement corrected from '{originalName}' to '{acknowledgement.StaffMemberName}'.", HttpContext.Connection.RemoteIpAddress?.ToString()), cancellationToken);
+
+        return RedirectToPage(new { id });
     }
 
     private async Task<IActionResult> SetStatusAsync(Guid id, InformationUpdateStatus status, AuditAction action, CancellationToken cancellationToken)
@@ -115,8 +170,9 @@ public sealed class NoticeModel(
 
         var notice = await dbContext.InformationUpdates
             .AsNoTracking()
-            .Include(item => item.Departments).ThenInclude(join => join.Department)
+            .Include(item => item.Departments).ThenInclude(join => join.Department).ThenInclude(department => department!.StaffMembers)
             .Include(item => item.Acknowledgements).ThenInclude(ack => ack.Department)
+            .Include(item => item.Acknowledgements).ThenInclude(ack => ack.StaffMember)
             .FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
 
         if (notice is null)
@@ -132,26 +188,43 @@ public sealed class NoticeModel(
             Body = notice.Body,
             AuthorizedBy = notice.AuthorizedBy,
             Type = notice.Type,
+            ReviewBy = notice.ReviewBy,
+            ExpiresOn = notice.ExpiresOn,
             DepartmentIds = notice.Departments.Select(join => join.DepartmentId).ToList()
         };
 
         DepartmentProgress = notice.Departments
             .Select(join =>
             {
-                var acknowledged = notice.Acknowledgements.Count(ack => ack.DepartmentId == join.DepartmentId);
-                var expected = join.Department?.ExpectedStaffCount ?? 0;
+                var directoryCount = join.Department?.StaffMembers.Count(staff => staff.IsActive) ?? 0;
+                var expected = directoryCount > 0 ? directoryCount : join.Department?.ExpectedStaffCount ?? 0;
+                var acknowledged = notice.Acknowledgements.Count(ack => ack.DepartmentId == join.DepartmentId && !ack.IsVoided);
                 return new DepartmentProgressRow(join.Department?.Name ?? "Unknown", expected, acknowledged, Math.Max(expected - acknowledged, 0));
             })
             .OrderBy(row => row.DepartmentName)
             .ToList();
 
         var expectedTotal = DepartmentProgress.Sum(row => row.ExpectedCount);
-        var acknowledgedTotal = notice.Acknowledgements.Count;
+        var acknowledgedTotal = notice.Acknowledgements.Count(ack => !ack.IsVoided);
         Progress = new NoticeProgress(expectedTotal, acknowledgedTotal, Math.Max(expectedTotal - acknowledgedTotal, 0));
+
+        var acknowledgedKeys = notice.Acknowledgements
+            .Where(ack => !ack.IsVoided)
+            .Select(ack => $"{ack.DepartmentId:N}:{ack.NormalizedStaffMemberName}")
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        MissingStaff = notice.Departments
+            .SelectMany(join => join.Department?.StaffMembers
+                .Where(staff => staff.IsActive)
+                .Where(staff => !acknowledgedKeys.Contains($"{staff.DepartmentId:N}:{staff.NormalizedName}"))
+                .Select(staff => new MissingStaffRow(staff.FullName, join.Department?.Name ?? "Unknown")) ?? [])
+            .OrderBy(row => row.DepartmentName)
+            .ThenBy(row => row.FullName)
+            .ToList();
 
         Acknowledgements = notice.Acknowledgements
             .OrderByDescending(ack => ack.AcknowledgedAt)
-            .Select(ack => new AcknowledgementRow(ack.StaffMemberName, ack.Department?.Name ?? "Unknown", ack.SignatureText, ack.AcknowledgedAt))
+            .Select(ack => new AcknowledgementRow(ack.Id, ack.StaffMemberName, ack.Department?.Name ?? "Unknown", ack.SignatureText, ack.AcknowledgedAt, ack.IsVoided, ack.CorrectionNote, ack.VoidReason))
             .ToList();
     }
 
@@ -173,6 +246,12 @@ public sealed class NoticeModel(
         [Required]
         public InformationUpdateType Type { get; set; } = InformationUpdateType.Routine;
 
+        [Display(Name = "Review by")]
+        public DateOnly? ReviewBy { get; set; }
+
+        [Display(Name = "Expires on")]
+        public DateOnly? ExpiresOn { get; set; }
+
         [Display(Name = "Departments")]
         [Required]
         public List<Guid> DepartmentIds { get; set; } = [];
@@ -181,5 +260,6 @@ public sealed class NoticeModel(
     public sealed record NoticeDetails(Guid Id, string Title, string Summary, string Type, string Status);
     public sealed record NoticeProgress(int ExpectedCount, int AcknowledgedCount, int OutstandingCount);
     public sealed record DepartmentProgressRow(string DepartmentName, int ExpectedCount, int AcknowledgedCount, int MissingCount);
-    public sealed record AcknowledgementRow(string StaffMemberName, string DepartmentName, string SignatureText, DateTimeOffset AcknowledgedAt);
+    public sealed record MissingStaffRow(string FullName, string DepartmentName);
+    public sealed record AcknowledgementRow(Guid Id, string StaffMemberName, string DepartmentName, string SignatureText, DateTimeOffset AcknowledgedAt, bool IsVoided, string? CorrectionNote, string? VoidReason);
 }

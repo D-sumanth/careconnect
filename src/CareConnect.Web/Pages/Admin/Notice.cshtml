@@ -55,6 +55,10 @@ else
                     <div class="mb-3"><label asp-for="Input.Body" class="form-label"></label><textarea asp-for="Input.Body" class="form-control" rows="7"></textarea><span asp-validation-for="Input.Body"></span></div>
                     <div class="mb-3"><label asp-for="Input.AuthorizedBy" class="form-label"></label><input asp-for="Input.AuthorizedBy" class="form-control" /><span asp-validation-for="Input.AuthorizedBy"></span></div>
                     <div class="mb-3"><label asp-for="Input.Type" class="form-label"></label><select asp-for="Input.Type" asp-items="Model.TypeOptions" class="form-select"></select></div>
+                    <div class="row g-3">
+                        <div class="col-md-6 mb-3"><label asp-for="Input.ReviewBy" class="form-label"></label><input asp-for="Input.ReviewBy" type="date" class="form-control" /></div>
+                        <div class="col-md-6 mb-3"><label asp-for="Input.ExpiresOn" class="form-label"></label><input asp-for="Input.ExpiresOn" type="date" class="form-control" /></div>
+                    </div>
                     <div class="mb-4"><label asp-for="Input.DepartmentIds" class="form-label"></label><select asp-for="Input.DepartmentIds" asp-items="Model.DepartmentOptions" class="form-select" multiple size="5"></select><span asp-validation-for="Input.DepartmentIds"></span></div>
                     <button class="btn btn-primary touch-button" type="submit">Save changes</button>
                 </form>
@@ -79,7 +83,7 @@ else
                 <h2 class="section-title">Acknowledgements</h2>
                 <div class="table-responsive">
                     <table class="table align-middle">
-                        <thead><tr><th>Staff member</th><th>Department</th><th>Signature</th><th>When</th></tr></thead>
+                        <thead><tr><th>Staff member</th><th>Department</th><th>Signature</th><th>When</th><th>Status</th><th>Admin action</th></tr></thead>
                         <tbody>
                             @foreach (var row in Model.Acknowledgements)
                             {
@@ -88,11 +92,60 @@ else
                                     <td>@row.DepartmentName</td>
                                     <td>@row.SignatureText</td>
                                     <td>@row.AcknowledgedAt.ToLocalTime().ToString("g")</td>
+                                    <td>
+                                        <span class="status-pill @(row.IsVoided ? "status-pill-muted" : string.Empty)">@(row.IsVoided ? "Voided" : "Active")</span>
+                                        @if (!string.IsNullOrWhiteSpace(row.CorrectionNote))
+                                        {
+                                            <div class="text-muted small">@row.CorrectionNote</div>
+                                        }
+                                        @if (!string.IsNullOrWhiteSpace(row.VoidReason))
+                                        {
+                                            <div class="text-muted small">@row.VoidReason</div>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (!row.IsVoided)
+                                        {
+                                            <details>
+                                                <summary class="btn btn-outline-primary btn-sm">Correct</summary>
+                                                <form method="post" asp-page-handler="CorrectAcknowledgement" asp-route-acknowledgementId="@row.Id" class="mt-2">
+                                                    <input name="staffMemberName" value="@row.StaffMemberName" class="form-control form-control-sm mb-2" />
+                                                    <input name="note" placeholder="Correction note" class="form-control form-control-sm mb-2" />
+                                                    <button class="btn btn-primary btn-sm" type="submit">Save correction</button>
+                                                </form>
+                                            </details>
+                                            <form method="post" asp-page-handler="VoidAcknowledgement" asp-route-acknowledgementId="@row.Id" class="mt-2">
+                                                <input name="reason" placeholder="Void reason" class="form-control form-control-sm mb-2" />
+                                                <button class="btn btn-outline-danger btn-sm" type="submit">Void</button>
+                                            </form>
+                                        }
+                                    </td>
                                 </tr>
                             }
                         </tbody>
                     </table>
                 </div>
+            </section>
+            <section class="content-panel mt-4">
+                <h2 class="section-title">Missing acknowledgements</h2>
+                @if (Model.MissingStaff.Count == 0)
+                {
+                    <p class="text-muted mb-0">No named staff are currently missing for this notice.</p>
+                }
+                else
+                {
+                    <div class="row g-2">
+                        @foreach (var missing in Model.MissingStaff)
+                        {
+                            <div class="col-md-6">
+                                <div class="missing-staff-chip">
+                                    <strong>@missing.FullName</strong>
+                                    <span>@missing.DepartmentName</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
             </section>
         </div>
     </div>

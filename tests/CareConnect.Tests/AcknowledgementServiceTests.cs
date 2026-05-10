@@ -15,7 +15,7 @@ public sealed class AcknowledgementServiceTests
         await using var dbContext = CreateDbContext();
         var clock = new FixedDateTimeProvider(new DateTimeOffset(2026, 5, 4, 12, 30, 0, TimeSpan.Zero));
         var audit = new AuditLogService(dbContext, clock);
-        var service = new AcknowledgementService(dbContext, clock, audit);
+        var service = new AcknowledgementService(dbContext, clock, new NameNormalizer(), audit);
         var seed = await SeedPublishedNoticeAsync(dbContext);
 
         var result = await service.CreateAsync(new AcknowledgementRequest(
@@ -33,6 +33,7 @@ public sealed class AcknowledgementServiceTests
         Assert.Equal(seed.DepartmentId, acknowledgement.DepartmentId);
         Assert.Equal(seed.LeadUserId, acknowledgement.LeadUserId);
         Assert.Equal("Sam Taylor", acknowledgement.StaffMemberName);
+        Assert.Equal("SAM TAYLOR", acknowledgement.NormalizedStaffMemberName);
         Assert.Equal(clock.UtcNow, acknowledgement.AcknowledgedAt);
         Assert.NotNull(acknowledgement.IpAddressHash);
         Assert.Equal(AuditAction.AcknowledgementSubmitted, (await dbContext.AuditLogs.SingleAsync()).Action);
@@ -43,7 +44,7 @@ public sealed class AcknowledgementServiceTests
     {
         await using var dbContext = CreateDbContext();
         var clock = new FixedDateTimeProvider(DateTimeOffset.UtcNow);
-        var service = new AcknowledgementService(dbContext, clock, new AuditLogService(dbContext, clock));
+        var service = new AcknowledgementService(dbContext, clock, new NameNormalizer(), new AuditLogService(dbContext, clock));
         var seed = await SeedPublishedNoticeAsync(dbContext);
 
         await service.CreateAsync(new AcknowledgementRequest(seed.UpdateId, seed.DepartmentId, seed.LeadUserId, "Alex Green", null, null, null));
@@ -57,7 +58,7 @@ public sealed class AcknowledgementServiceTests
     {
         await using var dbContext = CreateDbContext();
         var clock = new FixedDateTimeProvider(DateTimeOffset.UtcNow);
-        var service = new AcknowledgementService(dbContext, clock, new AuditLogService(dbContext, clock));
+        var service = new AcknowledgementService(dbContext, clock, new NameNormalizer(), new AuditLogService(dbContext, clock));
         var seed = await SeedPublishedNoticeAsync(dbContext);
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => service.CreateAsync(new AcknowledgementRequest(
@@ -68,6 +69,19 @@ public sealed class AcknowledgementServiceTests
             null,
             null,
             null)));
+    }
+
+    [Fact]
+    public async Task CreateAsync_RejectsDuplicateStaffNameForNoticeAndDepartment()
+    {
+        await using var dbContext = CreateDbContext();
+        var clock = new FixedDateTimeProvider(DateTimeOffset.UtcNow);
+        var service = new AcknowledgementService(dbContext, clock, new NameNormalizer(), new AuditLogService(dbContext, clock));
+        var seed = await SeedPublishedNoticeAsync(dbContext);
+
+        await service.CreateAsync(new AcknowledgementRequest(seed.UpdateId, seed.DepartmentId, seed.LeadUserId, "Alex Green", null, null, null));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.CreateAsync(new AcknowledgementRequest(seed.UpdateId, seed.DepartmentId, seed.LeadUserId, " alex   green ", null, null, null)));
     }
 
     private static AppDbContext CreateDbContext()

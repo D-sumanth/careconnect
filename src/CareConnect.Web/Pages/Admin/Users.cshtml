@@ -27,15 +27,36 @@
             <h2 class="section-title">Users</h2>
             <div class="table-responsive">
                 <table class="table align-middle">
-                    <thead><tr><th>Name</th><th>Email</th><th>Active</th><th>Last login</th></tr></thead>
+                    <thead><tr><th>Name</th><th>Email</th><th>Active</th><th>Last login</th><th></th></tr></thead>
                     <tbody>
                         @foreach (var user in Model.Users)
                         {
                             <tr>
                                 <td>@user.DisplayName</td>
                                 <td>@user.Email</td>
-                                <td>@(user.IsActive ? "Yes" : "No")</td>
+                                <td><span class="status-pill @(user.IsActive ? string.Empty : "status-pill-muted")">@(user.IsActive ? "Active" : "Inactive")</span></td>
                                 <td>@(user.LastLoginAt?.ToLocalTime().ToString("g") ?? "Never")</td>
+                                <td>
+                                    @if (user.IsActive)
+                                    {
+                                        <form method="post" asp-page-handler="Deactivate" asp-route-id="@user.Id">
+                                            <button class="btn btn-outline-danger btn-sm" type="submit">Deactivate</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <form method="post" asp-page-handler="Reactivate" asp-route-id="@user.Id">
+                                            <button class="btn btn-outline-primary btn-sm" type="submit">Reactivate</button>
+                                        </form>
+                                    }
+                                    <details class="mt-2">
+                                        <summary class="btn btn-outline-primary btn-sm">Reset password</summary>
+                                        <form method="post" asp-page-handler="ResetPassword" asp-route-id="@user.Id" class="mt-2">
+                                            <input name="temporaryPassword" class="form-control form-control-sm mb-2" placeholder="Temporary password" />
+                                            <button class="btn btn-primary btn-sm" type="submit">Set password</button>
+                                        </form>
+                                    </details>
+                                </td>
                             </tr>
                         }
                     </tbody>

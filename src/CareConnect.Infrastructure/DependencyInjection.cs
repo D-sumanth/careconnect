@@ -49,6 +49,7 @@ public static class DependencyInjection
                 options.Password.RequireNonAlphanumeric = false;
                 options.Lockout.AllowedForNewUsers = true;
                 options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
             })
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
@@ -57,6 +58,9 @@ public static class DependencyInjection
         {
             options.Cookie.Name = "__Host-CareConnect";
             options.Cookie.HttpOnly = true;
+            options.Cookie.SecurePolicy = string.Equals(environmentName, Environments.Development, StringComparison.OrdinalIgnoreCase)
+                ? CookieSecurePolicy.SameAsRequest
+                : CookieSecurePolicy.Always;
             options.Cookie.SameSite = SameSiteMode.Lax;
             options.LoginPath = "/Account/Login";
             options.AccessDeniedPath = "/Account/AccessDenied";
@@ -70,6 +74,7 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IDateTimeProvider, SystemDateTimeProvider>();
+        services.AddSingleton<INameNormalizer, NameNormalizer>();
         services.AddScoped<IAuditLogService, AuditLogService>();
         services.AddScoped<IAcknowledgementService, AcknowledgementService>();
         services.AddScoped<IAdminReportService, AdminReportService>();

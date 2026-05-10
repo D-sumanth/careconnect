@@ -12,6 +12,8 @@ public sealed class InformationUpdate : SoftDeleteEntity
     public InformationUpdateType Type { get; set; } = InformationUpdateType.Routine;
     public InformationUpdateStatus Status { get; set; } = InformationUpdateStatus.Draft;
     public DateTimeOffset? PublishedAt { get; set; }
+    public DateOnly? ReviewBy { get; set; }
+    public DateOnly? ExpiresOn { get; set; }
 
     public ICollection<InformationUpdateDepartment> Departments { get; } = new List<InformationUpdateDepartment>();
     public ICollection<Acknowledgement> Acknowledgements { get; } = new List<Acknowledgement>();

@@ -10,6 +10,7 @@ public sealed class Department : SoftDeleteEntity
     public bool IsActive { get; set; } = true;
 
     public ICollection<DepartmentMembership> Memberships { get; } = new List<DepartmentMembership>();
+    public ICollection<StaffMember> StaffMembers { get; } = new List<StaffMember>();
     public ICollection<InformationUpdateDepartment> InformationUpdateDepartments { get; } = new List<InformationUpdateDepartment>();
     public ICollection<Acknowledgement> Acknowledgements { get; } = new List<Acknowledgement>();
 }

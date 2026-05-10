@@ -3,6 +3,28 @@
 @{
     ViewData["Title"] = "Privacy Policy";
 }
-<h1>@ViewData["Title"]</h1>
-
-<p>Use this page to detail your site's privacy policy.</p>
+<section class="content-panel">
+    <p class="eyebrow mb-2">Privacy and compliance</p>
+    <h1 class="section-title">CareConnect privacy notice</h1>
+    <p class="lead-copy">CareConnect stores only the operational information needed to show notices, collect acknowledgements, and support audit review.</p>
+    <div class="row g-4 mt-1">
+        <div class="col-md-6">
+            <h2 class="h5 fw-bold">What is recorded</h2>
+            <ul>
+                <li>Staff member name and optional employee reference.</li>
+                <li>Department, notice, lead account, and acknowledgement timestamp.</li>
+                <li>Typed signature text entered during acknowledgement.</li>
+                <li>Privacy-conscious request metadata such as hashed IP address and user agent where available.</li>
+            </ul>
+        </div>
+        <div class="col-md-6">
+            <h2 class="h5 fw-bold">How records are handled</h2>
+            <ul>
+                <li>Acknowledgements are treated as compliance records and should not be hard-deleted.</li>
+                <li>Admin corrections and exports are audit logged.</li>
+                <li>Passwords and secrets are never stored in logs.</li>
+                <li>Retention periods should be confirmed by the care provider before production use.</li>
+            </ul>
+        </div>
+    </div>
+</section>

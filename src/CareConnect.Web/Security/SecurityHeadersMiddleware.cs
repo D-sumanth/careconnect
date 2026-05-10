@@ -10,7 +10,7 @@ public sealed class SecurityHeadersMiddleware(RequestDelegate next)
         headers.TryAdd("Referrer-Policy", "strict-origin-when-cross-origin");
         headers.TryAdd("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
         headers.TryAdd("Content-Security-Policy",
-            "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' data:; font-src 'self';");
+            "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' data:; font-src 'self';");
 
         await next(context);
     }

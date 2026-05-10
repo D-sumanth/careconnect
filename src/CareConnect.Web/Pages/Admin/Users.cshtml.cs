@@ -74,6 +74,72 @@ public sealed class UsersModel(
         return RedirectToPage();
     }
 
+    public async Task<IActionResult> OnPostDeactivateAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var admin = await userManager.GetUserAsync(User);
+        var user = await userManager.FindByIdAsync(id.ToString());
+        if (user is null)
+        {
+            return NotFound();
+        }
+
+        user.IsActive = false;
+        user.LockoutEnabled = true;
+        user.LockoutEnd = DateTimeOffset.UtcNow.AddYears(100);
+        await userManager.UpdateAsync(user);
+        await auditLogService.RecordAsync(new AuditLogEntry(admin?.Id, admin?.Email, AuditAction.UserChanged, nameof(ApplicationUser), user.Id.ToString(), $"User '{user.Email}' deactivated.", HttpContext.Connection.RemoteIpAddress?.ToString()), cancellationToken);
+        return RedirectToPage();
+    }
+
+    public async Task<IActionResult> OnPostReactivateAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var admin = await userManager.GetUserAsync(User);
+        var user = await userManager.FindByIdAsync(id.ToString());
+        if (user is null)
+        {
+            return NotFound();
+        }
+
+        user.IsActive = true;
+        user.LockoutEnd = null;
+        await userManager.UpdateAsync(user);
+        await auditLogService.RecordAsync(new AuditLogEntry(admin?.Id, admin?.Email, AuditAction.UserChanged, nameof(ApplicationUser), user.Id.ToString(), $"User '{user.Email}' reactivated.", HttpContext.Connection.RemoteIpAddress?.ToString()), cancellationToken);
+        return RedirectToPage();
+    }
+
+    public async Task<IActionResult> OnPostResetPasswordAsync(Guid id, string temporaryPassword, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(temporaryPassword) || temporaryPassword.Length < 8)
+        {
+            ModelState.AddModelError(string.Empty, "Temporary password must be at least 8 characters.");
+            await LoadAsync(cancellationToken);
+            return Page();
+        }
+
+        var admin = await userManager.GetUserAsync(User);
+        var user = await userManager.FindByIdAsync(id.ToString());
+        if (user is null)
+        {
+            return NotFound();
+        }
+
+        var token = await userManager.GeneratePasswordResetTokenAsync(user);
+        var result = await userManager.ResetPasswordAsync(user, token, temporaryPassword);
+        if (!result.Succeeded)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+            await LoadAsync(cancellationToken);
+            return Page();
+        }
+
+        await auditLogService.RecordAsync(new AuditLogEntry(admin?.Id, admin?.Email, AuditAction.UserChanged, nameof(ApplicationUser), user.Id.ToString(), $"Password reset for user '{user.Email}'.", HttpContext.Connection.RemoteIpAddress?.ToString()), cancellationToken);
+        return RedirectToPage();
+    }
+
     private async Task LoadAsync(CancellationToken cancellationToken)
     {
         Users = await dbContext.Users.AsNoTracking().OrderBy(user => user.DisplayName).ToListAsync(cancellationToken);

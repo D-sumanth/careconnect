@@ -27,7 +27,7 @@
 <section class="content-panel">
     <div class="table-responsive">
         <table class="table align-middle">
-            <thead><tr><th>Notice</th><th>Department</th><th>Staff member</th><th>Signature</th><th>Lead</th><th>When</th></tr></thead>
+            <thead><tr><th>Notice</th><th>Department</th><th>Staff member</th><th>Signature</th><th>Lead</th><th>When</th><th>Status</th></tr></thead>
             <tbody>
                 @foreach (var row in Model.Rows)
                 {
@@ -38,6 +38,7 @@
                         <td>@row.SignatureText</td>
                         <td>@row.LeadUserId</td>
                         <td>@row.AcknowledgedAt.ToLocalTime().ToString("g")</td>
+                        <td><span class="status-pill @(row.IsVoided ? "status-pill-muted" : string.Empty)">@(row.IsVoided ? "Voided" : "Active")</span></td>
                     </tr>
                 }
             </tbody>

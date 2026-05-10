@@ -24,4 +24,53 @@
     <div class="col-md-3"><div class="stat-card"><div class="stat-label">Outstanding</div><div class="display-6 fw-bold">@Model.Summary.Outstanding</div></div></div>
 </div>
 
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <section class="content-panel h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="section-title mb-0">Needs attention</h2>
+                <span class="status-pill">@Model.NeedsAttention.Count notices</span>
+            </div>
+            @if (Model.NeedsAttention.Count == 0)
+            {
+                <p class="text-muted mb-0">No published notices are currently showing outstanding acknowledgements.</p>
+            }
+            else
+            {
+                <div class="list-group list-group-flush">
+                    @foreach (var notice in Model.NeedsAttention)
+                    {
+                        <a class="list-group-item px-0 d-flex justify-content-between gap-3" asp-page="/Admin/Notice" asp-route-id="@notice.Id">
+                            <span><strong>@notice.Title</strong><span class="d-block text-muted small">@notice.DepartmentNames</span></span>
+                            <span class="status-pill status-pill-muted">@notice.OutstandingCount missing</span>
+                        </a>
+                    }
+                </div>
+            }
+        </section>
+    </div>
+    <div class="col-lg-6">
+        <section class="content-panel h-100">
+            <h2 class="section-title">Recent activity</h2>
+            @if (Model.RecentActivity.Count == 0)
+            {
+                <p class="text-muted mb-0">No audit activity has been recorded yet.</p>
+            }
+            else
+            {
+                <div class="list-group list-group-flush">
+                    @foreach (var activity in Model.RecentActivity)
+                    {
+                        <div class="list-group-item px-0">
+                            <strong>@activity.Action</strong>
+                            <div class="text-muted small">@activity.Description</div>
+                            <div class="text-muted small">@activity.OccurredAt.ToLocalTime().ToString("g")</div>
+                        </div>
+                    }
+                </div>
+            }
+        </section>
+    </div>
+</div>
+
 <partial name="_NoticeProgressTable" model="Model.Notices" />

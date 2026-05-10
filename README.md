@@ -1,6 +1,6 @@
 # CareConnect
 
-CareConnect is a care-home communication and acknowledgement platform. Department leads sign in on a shared/team device, present important notices to their teams, and record typed staff acknowledgements. Admin users can manage departments, users, notices, acknowledgement records, CSV exports, and audit logs.
+CareConnect is a care-home communication and acknowledgement platform. Department leads sign in on a shared/team device, present important notices to their teams, and record typed staff acknowledgements. Admin users can manage staff, departments, users, notices, acknowledgement records, CSV exports, and audit logs.
 
 ## Stack
 
@@ -9,6 +9,7 @@ CareConnect is a care-home communication and acknowledgement platform. Departmen
 - Entity Framework Core
 - PostgreSQL via Npgsql, ready for Neon
 - Serilog console logging
+- Built-in ASP.NET Core rate limiting
 - xUnit tests
 
 ## Solution Structure
@@ -85,12 +86,25 @@ For Neon, use the pooled connection string for normal app traffic. If you use a 
 ## Security Notes
 
 - HTTPS redirection and HSTS are enabled outside development.
-- Identity cookies are HTTP-only and SameSite=Lax.
+- Identity cookies are HTTP-only, Secure in non-development environments, and SameSite=Lax.
 - Razor forms use antiforgery protection.
 - Admin pages require the `Admin` role.
 - Lead pages require the `DepartmentLead` role.
+- Login and form traffic are rate-limited.
+- Accounts lock for 15 minutes after 5 failed password attempts.
+- Security headers include CSP, frame blocking, content-type protection, referrer policy, and permissions policy.
 - Audit logs avoid raw IP storage by hashing IP addresses.
 - Passwords are hashed by ASP.NET Core Identity.
+- Admin password reset is available from the Users page. Email-based self-service reset should be wired to a provider before wider rollout.
+
+## Compliance Notes
+
+- Staff directory records allow exact missing acknowledgement tracking.
+- Acknowledgements are treated as append-only compliance records.
+- Admin corrections and voids are audit logged instead of silently deleting records.
+- CSV exports include export metadata and are audit logged.
+- Confirm the final retention period with the care provider before live use. A common policy is to retain acknowledgement and audit records for multiple years.
+- Confirm Neon backup/restore settings before onboarding real care-home data.
 
 ## Testing
 
@@ -98,16 +112,28 @@ For Neon, use the pooled connection string for normal app traffic. If you use a 
 dotnet test
 ```
 
-Current coverage includes acknowledgement creation, duplicate team-member acknowledgement behavior, audit logging, anonymous redirects for protected pages, and the health endpoint.
+Current coverage includes acknowledgement creation, duplicate team-member acknowledgement behavior, audit logging, anonymous redirects for protected pages, production configuration guardrails, notice progress calculations, and the health endpoint.
 
 ## Azure App Service Deployment Notes
 
 1. Publish `src/CareConnect.Web`.
 2. Configure `ConnectionStrings__DefaultConnection` as an App Service setting.
 3. Set `ASPNETCORE_ENVIRONMENT=Production`.
-4. Run EF migrations from CI/CD or a controlled deployment step.
+4. Run EF migrations from CI/CD or a controlled deployment step before deploying code that depends on new columns.
 5. Enable HTTPS only.
 6. Configure log streaming or Application Insights as needed.
+7. Configure Azure budget alerts and App Service cost alerts.
+8. Prefer a staging slot for production changes when available: deploy to staging, smoke test `/health`, sign-in, admin notices, and lead acknowledgement, then swap.
+
+Recommended production release order:
+
+```powershell
+dotnet test
+dotnet ef database update --project src/CareConnect.Infrastructure --startup-project src/CareConnect.Web
+dotnet publish src/CareConnect.Web -c Release
+```
+
+The `/health` endpoint verifies the application can reach the configured database.
 
 ## Legacy Node App
 

@@ -46,6 +46,8 @@ public sealed class NoticesModel(
             Type = Input.Type,
             Status = status,
             PublishedAt = status == InformationUpdateStatus.Published ? DateTimeOffset.UtcNow : null,
+            ReviewBy = Input.ReviewBy,
+            ExpiresOn = Input.ExpiresOn,
             CreatedByUserId = admin?.Id
         };
 
@@ -83,6 +85,12 @@ public sealed class NoticesModel(
 
         [Required]
         public InformationUpdateType Type { get; set; } = InformationUpdateType.Routine;
+
+        [Display(Name = "Review by")]
+        public DateOnly? ReviewBy { get; set; }
+
+        [Display(Name = "Expires on")]
+        public DateOnly? ExpiresOn { get; set; }
 
         [Display(Name = "Departments")]
         [Required]

@@ -17,7 +17,20 @@
                 <div class="mb-3"><label asp-for="Input.Body" class="form-label"></label><textarea asp-for="Input.Body" class="form-control" rows="6"></textarea><span asp-validation-for="Input.Body"></span></div>
                 <div class="mb-3"><label asp-for="Input.AuthorizedBy" class="form-label"></label><input asp-for="Input.AuthorizedBy" class="form-control" /><span asp-validation-for="Input.AuthorizedBy"></span></div>
                 <div class="mb-3"><label asp-for="Input.Type" class="form-label"></label><select asp-for="Input.Type" asp-items="Model.TypeOptions" class="form-select"></select></div>
+                <div class="row g-3">
+                    <div class="col-md-6 mb-3"><label asp-for="Input.ReviewBy" class="form-label"></label><input asp-for="Input.ReviewBy" type="date" class="form-control" /></div>
+                    <div class="col-md-6 mb-3"><label asp-for="Input.ExpiresOn" class="form-label"></label><input asp-for="Input.ExpiresOn" type="date" class="form-control" /></div>
+                </div>
                 <div class="mb-3"><label asp-for="Input.DepartmentIds" class="form-label"></label><select asp-for="Input.DepartmentIds" asp-items="Model.DepartmentOptions" class="form-select" multiple size="5"></select><span asp-validation-for="Input.DepartmentIds"></span></div>
+                <details class="mb-3">
+                    <summary class="fw-bold">Common notice templates</summary>
+                    <div class="template-hints mt-2">
+                        <span>Kitchen safety</span>
+                        <span>Infection control</span>
+                        <span>Fire drill</span>
+                        <span>Training update</span>
+                    </div>
+                </details>
                 <div class="form-check mb-4"><input asp-for="Input.PublishNow" class="form-check-input" /><label asp-for="Input.PublishNow" class="form-check-label"></label></div>
                 <button class="btn btn-primary touch-button" type="submit">Create notice</button>
             </form>
