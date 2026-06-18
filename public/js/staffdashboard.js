@@ -260,6 +260,15 @@ async function acknowledgeInfo(infoId, button) {
     alert("Failed to acknowledge information");
   }
 }
+document.addEventListener('DOMContentLoaded', async () => {
+  // Any staff dashboard-specific initialization code
+  
+  // Set up automatic refresh of counts every 30 seconds
+  setInterval(() => {
+    InfoManager.fetchAndDisplayCounts();
+  }, 30000);
+});
+
 
 // Initial load
 fetchInformation();
